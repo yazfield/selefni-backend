@@ -9,3 +9,4 @@ Homestead.yaml
 composer.lock
 bootstrap/cache
 /config/codestyles/
+/_ide_helper.php

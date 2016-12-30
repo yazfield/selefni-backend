@@ -16,9 +16,10 @@ $factory->define(App\User::class, function (Faker\Generator $faker) {
     static $password;
 
     return [
-        'name' => $faker->name,
+        'name' => preg_replace('/[^a-z ]/', '', strtolower($faker->name)),
         'email' => $faker->unique()->safeEmail,
-        'password' => $password ?: $password = bcrypt('secret'),
+        'password' => $password ?: $password = 'mysecret',
         'remember_token' => str_random(10),
+        'phone_number' => $faker->unique()->e164PhoneNumber,
     ];
 });

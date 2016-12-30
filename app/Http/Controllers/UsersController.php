@@ -17,6 +17,11 @@ class UsersController extends Controller
      */
     public $userService;
 
+    /**
+     * @var Validator
+     */
+    public $validator;
+
 
     /**
      * UsersController constructor.
@@ -26,6 +31,7 @@ class UsersController extends Controller
     public function __construct(UserService $userService)
     {
         $this->userService = $userService;
+        $this->validator = app('validator');
     }
 
 
@@ -60,7 +66,7 @@ class UsersController extends Controller
      */
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
+        $validator = $this->validator->make($request->all(), [
             'email'        => "required|email|unique:users",
             'password'     => 'required|min:8',
             'name'         => 'required|regex:/^[\pL\s\-]+$/u|min:3',
@@ -111,7 +117,7 @@ class UsersController extends Controller
     public function update(Request $request, $id)
     {
         $user = $this->userService->find($id);
-        $validator = Validator::make($request->all(), [
+        $validator = $this->validator->make($request->all(), [
             'email'        => "sometimes|email|unique:users,id,{$user->id}",
             'password'     => 'sometimes|min:8',
             'name'         => 'sometimes|regex:/^[\pL\s\-]+$/u|min:3',
