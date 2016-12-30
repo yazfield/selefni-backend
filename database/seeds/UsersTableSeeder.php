@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Database\Seeder;
 use App\User;
+use Illuminate\Database\Seeder;
 use Illuminate\Contracts\Hashing\Hasher;
 
 class UsersTableSeeder extends Seeder

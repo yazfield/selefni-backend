@@ -2,13 +2,12 @@
 
 namespace App\Providers;
 
+use App\Services\User as UserService;
 use Illuminate\Support\ServiceProvider;
 use App\Services\Contracts\UserService as UserServiceContract;
-use App\Services\User as UserService;
 
 class ServicesServiceProvider extends ServiceProvider
 {
-
     /**
      * Bootstrap the application services.
      *
@@ -18,7 +17,6 @@ class ServicesServiceProvider extends ServiceProvider
     {
         //
     }
-
 
     /**
      * Register the application services.
