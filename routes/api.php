@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Http\Request;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,4 +12,4 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::resource('/users', 'UsersController');//->middleware('auth:api');
+Route::resource('/users', 'UsersController'); //->middleware('auth:api');

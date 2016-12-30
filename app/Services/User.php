@@ -3,27 +3,24 @@
  * Created by PhpStorm.
  * User: yzid
  * Date: 12/30/16
- * Time: 6:51 PM
+ * Time: 6:51 PM.
  */
 
 namespace App\Services;
 
-use App\Services\Contracts\UserService as UserServiceContract;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use App\User as UserModel;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use App\Services\Contracts\UserService as UserServiceContract;
 
 /**
- * User Service class
- * @package App\Services
+ * User Service class.
  */
 class User implements UserServiceContract
 {
-
     /**
      * @var UserModel
      */
     private $model;
-
 
     /**
      * @return UserModel
@@ -33,7 +30,6 @@ class User implements UserServiceContract
         return $this->model;
     }
 
-
     /**
      * @param UserModel $model
      */
@@ -41,7 +37,6 @@ class User implements UserServiceContract
     {
         $this->model = $model;
     }
-
 
     /**
      * User constructor.
@@ -52,7 +47,6 @@ class User implements UserServiceContract
     {
         $this->setModel($model);
     }
-
 
     public function find($id, $includeTrashed = false)
     {
@@ -65,7 +59,6 @@ class User implements UserServiceContract
         return $this->returnOrThrow($result);
     }
 
-
     public function findBy($field, $value, $includeTrashed = false)
     {
         $result = $this->model->where($field, $value);
@@ -76,12 +69,11 @@ class User implements UserServiceContract
         return $this->returnOrThrow($result->first());
     }
 
-
     public function store(array $data)
     {
         // check if user already exists
         // TODO: find a better way to get unique fields
-        $fields = [ 'email', 'phone_number' ];
+        $fields = ['email', 'phone_number'];
         $user = null;
         foreach ($fields as $field) {
             try {
@@ -90,7 +82,7 @@ class User implements UserServiceContract
                 $user = null;
             }
         }
-        if ( ! is_null($user)) {
+        if (! is_null($user)) {
             // user had deleted his account
             if ($user->trashed()) {
                 $user->restore();
@@ -108,7 +100,6 @@ class User implements UserServiceContract
         }
     }
 
-
     public function activate($id)
     {
         if ($id instanceof UserModel) {
@@ -122,12 +113,10 @@ class User implements UserServiceContract
         return $result;
     }
 
-
     public function deactivate($id)
     {
         throw new \Exception('TODO: Implement deactivate() method.');
     }
-
 
     public function update($id, array $data)
     {
@@ -141,7 +130,6 @@ class User implements UserServiceContract
         return $result;
     }
 
-
     public function destroy($id)
     {
         $user = $this->find($id);
@@ -149,7 +137,6 @@ class User implements UserServiceContract
 
         return $user->delete();
     }
-
 
     /**
      * Throws exception if $result is null or returns $result.
