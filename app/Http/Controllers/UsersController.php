@@ -93,7 +93,17 @@ class UsersController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $user = $this->userService->find($id);
+        $validator = Validator::make($request->all(), [
+            'email' => "sometimes|email|unique:users,id,{$user->id}",
+            'password' => 'sometimes|min:8',
+            'name' => 'sometimes|regex:/^[\pL\s\-]+$/u|min:3',
+            'phone_number' => "sometimes|unique:users,id,{$user->id}|regex:/^\(?\+?([0-9]{1,4})\)?[-\. ]?(\d{3})[-\. ]?([0-9]{7})$/u",
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['message' => $validator->messages()], 400);
+        }
+        return $this->userService->update($user, $request->all());
     }
 
     /**

@@ -105,7 +105,12 @@ class User implements UserServiceContract
 
     public function update($id, array $data)
     {
-        // TODO: Implement update() method.
+        if($id instanceof UserModel)
+            $result = $id;
+        else
+            $result = $this->find($id);
+        $result->fill($data)->save();
+        return $result;
     }
 
     public function destroy($id)
