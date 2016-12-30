@@ -168,6 +168,7 @@ return [
          */
 
         Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class,
+        Laravel\Passport\PassportServiceProvider::class,
 
         /*
          * Application Service Providers...
