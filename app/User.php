@@ -8,12 +8,18 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 /**
- * Class User model
+ * User model class.
  * @package App
  */
 class User extends Authenticatable
 {
     use Notifiable, SoftDeletes;
+
+    /**
+     * Hasher class for password hashing
+     * @var Hasher|null
+     */
+    public $_hasher = null;
 
     /**
      * The attributes that are mass assignable.
@@ -30,7 +36,7 @@ class User extends Authenticatable
     protected $hidden = ['password', 'remember_token', 'deleted_at',];
 
     /**
-     * Cast to Carbon dates
+     * Cast to Carbon dates.
      * @var array
      */
     protected $dates = ['deleted_at'];
@@ -48,19 +54,24 @@ class User extends Authenticatable
      */
     public function __construct(array $attributes = [], Hasher $hasher)
     {
+        $this->_hasher = $hasher;
         parent::__construct($attributes);
-        $this->hasher = $hasher;
     }
 
     /**
-     * Hashing password value before saving
+     * Hashing password value before saving.
      * @param String $value Password
      */
     public function setPasswordAttribute($value)
     {
-        $this->attributes['password'] = $this->hasher->make($value);
+        $this->attributes['password'] = $this->_hasher->make($value);
     }
 
+    /**
+     * Active users scope.
+     * @param $query
+     * @return mixed
+     */
     public function scopeActive($query) {
         return $query->where('active', true);
     }
