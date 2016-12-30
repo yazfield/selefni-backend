@@ -114,6 +114,14 @@ class UsersController extends Controller
      */
     public function destroy($id)
     {
-        //
+        if($this->userService->destroy($id)) {
+            return response()->json([
+                'message' => 'User deleted',
+            ], 200);
+        }
+        // TODO: return this message in handler whatever error it is in production
+        return response()->json([
+            'message' => 'Server error',
+        ], 500);
     }
 }

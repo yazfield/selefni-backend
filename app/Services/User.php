@@ -115,7 +115,9 @@ class User implements UserServiceContract
 
     public function destroy($id)
     {
-        // TODO: Implement destroy() method.
+        $user = $this->find($id);
+        $user->active = false;
+        return $user->delete();
     }
 
     /**
