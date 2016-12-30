@@ -3,10 +3,9 @@
  * Created by PhpStorm.
  * User: yzid
  * Date: 12/30/16
- * Time: 6:58 PM
+ * Time: 6:58 PM.
  */
-
-if ( ! function_exists('username_field')) {
+if (! function_exists('username_field')) {
     /**
      * Decides what field to look in for finding a user.
      *

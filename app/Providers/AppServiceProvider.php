@@ -2,12 +2,11 @@
 
 namespace App\Providers;
 
-use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Contracts\Hashing\Hasher;
 
 class AppServiceProvider extends ServiceProvider
 {
-
     /**
      * Bootstrap any application services.
      *
@@ -17,7 +16,6 @@ class AppServiceProvider extends ServiceProvider
     {
         //
     }
-
 
     /**
      * Register any application services.

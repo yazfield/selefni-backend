@@ -1,16 +1,13 @@
 <?php
 
-use Illuminate\Foundation\Testing\WithoutMiddleware;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
 use App\Services\Contracts\UserService;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
 
 class UserServiceTest extends TestCase
 {
-
     use DatabaseMigrations;
 
     private $userService;
-
 
     public function setUp()
     {
@@ -18,23 +15,20 @@ class UserServiceTest extends TestCase
         $this->userService = app(UserService::class);
     }
 
-
     private function storeUserData()
     {
         return [
-            'name'         => 'mock',
-            'email'        => 'mock@email.com',
-            'password'     => 'mock',
+            'name' => 'mock',
+            'email' => 'mock@email.com',
+            'password' => 'mock',
             'phone_number' => '213666666666',
         ];
     }
-
 
     private function storeUser()
     {
         return $this->userService->store($this->storeUserData());
     }
-
 
     public function testFind()
     {
@@ -47,7 +41,6 @@ class UserServiceTest extends TestCase
         $this->assertEquals($user->toArray(), $user4->toArray());
     }
 
-
     public function testFindBy()
     {
         $user = $this->storeUser();
@@ -59,7 +52,6 @@ class UserServiceTest extends TestCase
         $this->assertEquals($user->toArray(), $user4->toArray());
     }
 
-
     public function testStoreUser()
     {
         $user = $this->storeUser();
@@ -70,20 +62,18 @@ class UserServiceTest extends TestCase
         $this->assertEquals(false, $user->active);
     }
 
-
     public function testUpdate()
     {
         $user = $this->storeUser();
         $data = [
-            'name'         => 'mocky',
-            'email'        => 'mocky@email.com',
-            'password'     => 'mocky',
+            'name' => 'mocky',
+            'email' => 'mocky@email.com',
+            'password' => 'mocky',
             'phone_number' => '213666666669',
         ];
         $user2 = $this->userService->update($user, $data);
         $this->seeInDatabase('users', array_except($data, 'password'));
     }
-
 
     public function testActivate()
     {
@@ -92,7 +82,6 @@ class UserServiceTest extends TestCase
         $this->assertEquals(true, $user2->active);
     }
 
-
     public function testStoreDeleted()
     {
         $user = $this->storeUser();
@@ -100,5 +89,4 @@ class UserServiceTest extends TestCase
         $newuser = $this->storeUser();
         $this->assertEquals($user->id, $newuser->id);
     }
-
 }
