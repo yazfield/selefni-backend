@@ -6,6 +6,7 @@ use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Laravel\Passport\HasApiTokens;
 
 /**
  * User model class.
@@ -13,7 +14,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
  */
 class User extends Authenticatable
 {
-    use Notifiable, SoftDeletes;
+    use Notifiable, SoftDeletes, HasApiTokens;
 
     /**
      * Hasher class for password hashing
@@ -52,9 +53,9 @@ class User extends Authenticatable
      * @param array $attributes
      * @param Hasher $hasher
      */
-    public function __construct(array $attributes = [], Hasher $hasher)
+    public function __construct(array $attributes = [])
     {
-        $this->_hasher = $hasher;
+        $this->_hasher = app(Hasher::class);
         parent::__construct($attributes);
     }
 
@@ -74,5 +75,14 @@ class User extends Authenticatable
      */
     public function scopeActive($query) {
         return $query->where('active', true);
+    }
+
+    /**
+     * Tells \Passport how to find a user.
+     * @param mixed $username
+     * @return mixed
+     */
+    public function findForPassport($username) {
+        return $this->active()->where(username_field($username), $username)->first();
     }
 }
