@@ -51,7 +51,15 @@ class UsersController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validator = Validator::make($request->all(), [
+            'email' => "required|email|unique:users",
+            'password' => 'required|min:8',
+            'name' => 'required|regex:/^[\pL\s\-]+$/u|min:3',
+            'phone_number' => "sometimes|unique:users|regex:/^\(?\+?([0-9]{1,4})\)?[-\. ]?(\d{3})[-\. ]?([0-9]{7})$/u",
+        ]);
+        if ($validator->fails())
+            return response()->json(['message' => $validator->messages()], 400);
+        return $this->userService->store($request->all());
     }
 
     /**

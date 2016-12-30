@@ -58,14 +58,39 @@ class User implements UserServiceContract
         return $this->returnOrThrow($result);
     }
 
-    public function findBy($field, $value, $includeTrashed = false)
-    {
-        // TODO: Implement findBy() method.
+    public function findBy($field, $value, $includeTrashed = false) {
+        $result = $this->model->where($field, $value);
+        if($includeTrashed)
+            $result = $result->withTrashed();
+        return $this->returnOrThrow($result->first());
     }
 
-    public function store(array $data)
-    {
-        // TODO: Implement store() method.
+    public function store(array $data) {
+        // check if user already exists
+        // TODO: find a better way to get unique fields
+        $fields = ['email', 'phone_number'];
+        $user = null;
+        foreach ($fields as $field) {
+            try {
+                $user = $this->findBy($field, $data[$field], true);
+            } catch(\Exception $e) {
+                $user = null;
+            }
+        }
+        if(!is_null($user)) {
+            // user had deleted his account
+            if($user->trashed()){
+                $user->restore();
+            } else {
+                $user->fill($data)->save();
+            }
+            // event: send activation email
+            return $user;
+        } else {
+            $data['active'] = false;
+            // event: send activation email
+            return $this->model->create($data);
+        }
     }
 
     public function activate($id)
