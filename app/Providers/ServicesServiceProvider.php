@@ -8,6 +8,7 @@ use App\Services\User as UserService;
 
 class ServicesServiceProvider extends ServiceProvider
 {
+
     /**
      * Bootstrap the application services.
      *
@@ -17,6 +18,7 @@ class ServicesServiceProvider extends ServiceProvider
     {
         //
     }
+
 
     /**
      * Register the application services.

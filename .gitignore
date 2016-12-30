@@ -8,3 +8,4 @@ Homestead.yaml
 .env
 composer.lock
 bootstrap/cache
+/config/codestyles/
