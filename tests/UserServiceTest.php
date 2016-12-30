@@ -72,4 +72,19 @@ class UserServiceTest extends TestCase
         $user2 = $this->userService->update($user, $data);
         $this->seeInDatabase('users', array_except($data, 'password'));
     }
+    public function testActivate()
+    {
+        $user = $this->storeUser();
+        $user2 = $this->userService->activate($user->id);
+        $this->assertEquals(true, $user2->active);
+    }
+
+    public function testStoreDeleted()
+    {
+        $user = $this->storeUser();
+        $this->userService->destroy($user->id);
+        $newuser = $this->storeUser();
+        $this->assertEquals($user->id, $newuser->id);
+    }
+
 }

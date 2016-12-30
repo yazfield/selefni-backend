@@ -95,12 +95,18 @@ class User implements UserServiceContract
 
     public function activate($id)
     {
-        // TODO: Implement activate() method.
+        if($id instanceof UserModel)
+            $result = $id;
+        else
+            $result = $this->find($id);
+        $result->active = true;
+        $result->save();
+        return $result;
     }
 
     public function deactivate($id)
     {
-        // TODO: Implement deactivate() method.
+        throw new \Exception('TODO: Implement deactivate() method.');
     }
 
     public function update($id, array $data)
