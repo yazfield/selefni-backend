@@ -8,10 +8,10 @@
 
 namespace App\Services;
 
-use App\Events\UserEvents\UserSubscribedEvent;
-use App\Services\Contracts\UserService as UserServiceContract;
 use App\User as UserModel;
+use App\Events\UserEvents\UserSubscribedEvent;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use App\Services\Contracts\UserService as UserServiceContract;
 
 /**
  * User Service class.
@@ -25,6 +25,7 @@ class User implements UserServiceContract
 
     /**
      * User constructor.
+     *
      * @param UserModel $model
      */
     public function __construct(UserModel $model)
@@ -93,7 +94,9 @@ class User implements UserServiceContract
 
     /**
      * Throws exception if $result is null or returns $result.
+     *
      * @param UserModel|null $result
+     *
      * @return UserModel
      */
     private function returnOrThrow($result)
