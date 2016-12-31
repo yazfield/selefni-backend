@@ -2,24 +2,25 @@
 
 namespace App\Events\UserEvents;
 
-use App\Events\AbstractEvent;
 use App\User as UserModel;
+use App\Events\AbstractEvent;
 use Illuminate\Broadcasting\Channel;
 
 /**
- * Parent User events class
+ * Parent User events class.
  */
 abstract class AbstractUserEvent extends AbstractEvent
 {
-
     /**
      * UserModel model.
+     *
      * @var UserModel
      */
     protected $user;
 
     /**
      * Create a new event instance.
+     *
      * @return void
      */
     public function __construct(UserModel $user)
@@ -45,6 +46,7 @@ abstract class AbstractUserEvent extends AbstractEvent
 
     /**
      * Get the channels the event should broadcast on.
+     *
      * @return Channel|array
      */
     final public function broadcastOn()
@@ -56,5 +58,4 @@ abstract class AbstractUserEvent extends AbstractEvent
     {
         return 'user';
     }
-
 }

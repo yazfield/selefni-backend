@@ -2,11 +2,11 @@
 
 namespace App\Events;
 
-use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Broadcasting\InteractsWithSockets;
 
 /**
- * Parent User events class
+ * Parent User events class.
  */
 abstract class AbstractEvent
 {
@@ -14,12 +14,14 @@ abstract class AbstractEvent
 
     /**
      * Parent Event channel name.
+     *
      * @return string
      */
     abstract public function parentChannel(): string;
 
     /**
      * Channel name.
+     *
      * @return string
      */
     abstract public function channel(): string;

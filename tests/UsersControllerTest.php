@@ -1,8 +1,6 @@
 <?php
 
-use Illuminate\Foundation\Testing\WithoutMiddleware;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 class UsersControllerTest extends TestCase
 {
@@ -18,7 +16,7 @@ class UsersControllerTest extends TestCase
     public function testValidationFails()
     {
         $data = factory(App\User::class)->make()->toArray();
-        $this->json('POST', 'api/users', $data)->seeJsonStructure([ 'message' ])->seeStatusCode(400);
+        $this->json('POST', 'api/users', $data)->seeJsonStructure(['message'])->seeStatusCode(400);
     }
 
     public function testShow()
@@ -31,7 +29,7 @@ class UsersControllerTest extends TestCase
 
     public function testNotFound()
     {
-        $this->json('GET', "api/users/blah")->seeJsonStructure([ 'message' ])->seeStatusCode(404);
+        $this->json('GET', 'api/users/blah')->seeJsonStructure(['message'])->seeStatusCode(404);
     }
 
     public function testUpdate()
@@ -39,9 +37,9 @@ class UsersControllerTest extends TestCase
         $user = factory(App\User::class)->make();
         $data = array_add($user->toArray(), 'password', 'mysecret');
         $this->json('POST', 'api/users', $data);
-        $data[ 'name' ] = 'updated';
+        $data['name'] = 'updated';
         $this->json('PUT', "api/users/{$data['email']}",
-            array_only($data, [ 'name' ]))->seeJsonContains(array_except($data, 'password'));
+            array_only($data, ['name']))->seeJsonContains(array_except($data, 'password'));
     }
 
     public function testDestroy()
@@ -49,6 +47,6 @@ class UsersControllerTest extends TestCase
         $user = factory(App\User::class)->make();
         $data = array_add($user->toArray(), 'password', 'mysecret');
         $this->json('POST', 'api/users', $data);
-        $this->json('DELETE', "api/users/{$data['email']}")->seeJsonStructure([ 'message' ])->seeStatusCode(200);
+        $this->json('DELETE', "api/users/{$data['email']}")->seeJsonStructure(['message'])->seeStatusCode(200);
     }
 }
