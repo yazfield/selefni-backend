@@ -8,9 +8,10 @@
 
 namespace App\Services;
 
+use App\Events\UserEvents\UserSubscribedEvent;
+use App\Services\Contracts\UserService as UserServiceContract;
 use App\User as UserModel;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use App\Services\Contracts\UserService as UserServiceContract;
 
 /**
  * User Service class.
@@ -21,6 +22,15 @@ class User implements UserServiceContract
      * @var UserModel
      */
     private $model;
+
+    /**
+     * User constructor.
+     * @param UserModel $model
+     */
+    public function __construct(UserModel $model)
+    {
+        $this->setModel($model);
+    }
 
     /**
      * @return UserModel
@@ -36,37 +46,6 @@ class User implements UserServiceContract
     public function setModel(UserModel $model)
     {
         $this->model = $model;
-    }
-
-    /**
-     * User constructor.
-     *
-     * @param UserModel $model
-     */
-    public function __construct(UserModel $model)
-    {
-        $this->setModel($model);
-    }
-
-    public function find($id, $includeTrashed = false)
-    {
-        $result = $this->model->where(username_field($id), $id);
-        if ($includeTrashed) {
-            $result = $result->withTrashed();
-        }
-        $result = $result->first();
-
-        return $this->returnOrThrow($result);
-    }
-
-    public function findBy($field, $value, $includeTrashed = false)
-    {
-        $result = $this->model->where($field, $value);
-        if ($includeTrashed) {
-            $result = $result->withTrashed();
-        }
-
-        return $this->returnOrThrow($result->first());
     }
 
     public function store(array $data)
@@ -93,11 +72,37 @@ class User implements UserServiceContract
             // event: send activation email
             return $user;
         } else {
+            // subscribe new user
             $data['active'] = false;
+            $result = $this->model->create($data);
+            event(new UserSubscribedEvent($result));
 
-            // event: send activation email
-            return $this->model->create($data);
+            return $result;
         }
+    }
+
+    public function findBy($field, $value, $includeTrashed = false)
+    {
+        $result = $this->model->where($field, $value);
+        if ($includeTrashed) {
+            $result = $result->withTrashed();
+        }
+
+        return $this->returnOrThrow($result->first());
+    }
+
+    /**
+     * Throws exception if $result is null or returns $result.
+     * @param UserModel|null $result
+     * @return UserModel
+     */
+    private function returnOrThrow($result)
+    {
+        if (is_null($result)) {
+            throw new ModelNotFoundException;
+        }
+
+        return $result;
     }
 
     public function activate($id)
@@ -111,6 +116,17 @@ class User implements UserServiceContract
         $result->save();
 
         return $result;
+    }
+
+    public function find($id, $includeTrashed = false)
+    {
+        $result = $this->model->where(username_field($id), $id);
+        if ($includeTrashed) {
+            $result = $result->withTrashed();
+        }
+        $result = $result->first();
+
+        return $this->returnOrThrow($result);
     }
 
     public function deactivate($id)
@@ -136,21 +152,5 @@ class User implements UserServiceContract
         $user->active = false;
 
         return $user->delete();
-    }
-
-    /**
-     * Throws exception if $result is null or returns $result.
-     *
-     * @param UserModel|null $result
-     *
-     * @return UserModel
-     */
-    private function returnOrThrow($result)
-    {
-        if (is_null($result)) {
-            throw new ModelNotFoundException;
-        }
-
-        return $result;
     }
 }

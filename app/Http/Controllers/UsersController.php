@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Services\Contracts\UserService;
+use Illuminate\Http\Request;
 
 /**
  * Class UsersController
@@ -59,9 +59,10 @@ class UsersController extends Controller
 
     /**
      * Store a newly created resource in storage.
-     *
+     * This could be either a user subscription
+     * or a user created to hold items relation.
      * @param  \Illuminate\Http\Request $request
-     *
+
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
@@ -76,7 +77,7 @@ class UsersController extends Controller
             return response()->json([ 'message' => $validator->messages() ], 400);
         }
 
-        return $this->userService->store($request->all());
+        return response()->json($this->userService->store($request->all())->toArray());
     }
 
 
