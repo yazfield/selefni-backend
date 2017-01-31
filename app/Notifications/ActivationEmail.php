@@ -43,8 +43,14 @@ class ActivationEmail extends Notification
     public function toMail(User $notifiable)
     {
         // TODO: setup lang files and email views
-        return (new MailMessage)->greeting('Hello,')->line('The introduction to the notification.')->action('Notification Action',
-            'https://laravel.com')->line('Thank you for using our application!');
+        return (new MailMessage)->greeting('Hello,')
+            ->line('The introduction to the notification.')
+            ->action('Notification Action','https://laravel.com')
+            ->line('Thank you for using our application!')
+            ->action('Activate your account', route('activate_user', [
+                'code' => $notifiable->activation_code,
+                'id' => $notifiable->id,
+            ]));
     }
 
     /**

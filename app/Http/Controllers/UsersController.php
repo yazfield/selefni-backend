@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Services\Contracts\UserService;
+use App\Exceptions\ActivationCodeExpiredException;
 
 /**
  * Class UsersController.
@@ -139,8 +140,24 @@ class UsersController extends Controller
         }
 
         // TODO: return this message in handler whatever error it is in production
+        // make it an exception
         return response()->json([
             'message' => 'Server error',
         ], 500);
+    }
+
+    public function activate($id, $code)
+    {
+        $code = intval($code);
+        try {
+            $this->userService->activate($id, $code);
+            return response()->json([
+                'message' => 'User activated',
+            ], 200);
+        } catch(ActivationCodeExpiredException $e) {
+            return response()->json([
+                'message' => 'Activation code has expired',
+            ], 300);
+        }
     }
 }

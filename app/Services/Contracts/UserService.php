@@ -53,10 +53,13 @@ interface UserService
      * Activate user.
      *
      * @param mixed $id \App\User model or user identifier
+     * @param int $code Activation code
+     *
+     * @throws \App\Exceptions\ActivationCodeExpiredException
      *
      * @return \App\User
      */
-    public function activate($id);
+    public function activate($id, int $code);
 
     /**
      * Deactivate user.

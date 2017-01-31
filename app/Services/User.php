@@ -12,6 +12,9 @@ use App\User as UserModel;
 use App\Events\UserEvents\UserSubscribedEvent;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use App\Services\Contracts\UserService as UserServiceContract;
+use Carbon\Carbon;
+use Config;
+use App\Exceptions\ActivationCodeExpiredException;
 
 /**
  * User Service class.
@@ -70,12 +73,13 @@ class User implements UserServiceContract
                 $user->fill($data)->save();
             }
 
-            // event: send activation email
+            // TODO: event send activation email
             return $user;
         } else {
             // subscribe new user
             $data['active'] = false;
-            $result = $this->model->create($data);
+            $result = new $this->model($data);
+            $result->requestActivation()->save();
             event(new UserSubscribedEvent($result));
 
             return $result;
@@ -108,14 +112,15 @@ class User implements UserServiceContract
         return $result;
     }
 
-    public function activate($id)
+    public function activate($id, int $code)
     {
         if ($id instanceof UserModel) {
             $result = $id;
         } else {
             $result = $this->find($id);
         }
-        $result->active = true;
+        if(!$result->activate($code))
+            throw new ActivationCodeExpiredException;
         $result->save();
 
         return $result;

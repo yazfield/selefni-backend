@@ -1,11 +1,31 @@
 <?php
 
+use App\Services\Contracts\UserService;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 
 class UsersControllerTest extends TestCase
 {
     use DatabaseMigrations;
+    public function setUp()
+    {
+        parent::setUp();
+        $this->userService = app(UserService::class);
+    }
 
+    private function storeUserData()
+    {
+        return [
+            'name' => 'mock',
+            'email' => 'mock@email.com',
+            'password' => 'mock',
+            'phone_number' => '213666666666',
+        ];
+    }
+
+    private function storeUser()
+    {
+        return $this->userService->store($this->storeUserData());
+    }
     public function testStore()
     {
         $user = factory(App\User::class)->make();
@@ -48,5 +68,23 @@ class UsersControllerTest extends TestCase
         $data = array_add($user->toArray(), 'password', 'mysecret');
         $this->json('POST', 'api/users', $data);
         $this->json('DELETE', "api/users/{$data['email']}")->seeJsonStructure(['message'])->seeStatusCode(200);
+    }
+
+    public function testActivate()
+    {
+        $user = $this->storeUser();
+        $this->json('GET', route('activate_user', [
+            'id' => $user->id,
+            'code' => $user->activation_code
+        ]))->seeJsonStructure(['message'])->seeStatusCode(200);
+    }
+
+    public function testActivateFails()
+    {
+        $user = $this->storeUser();
+        $this->json('GET', route('activate_user', [
+            'id' => $user->id,
+            'code' => 1,
+        ]))->seeJsonStructure(['message'])->seeStatusCode(300);
     }
 }

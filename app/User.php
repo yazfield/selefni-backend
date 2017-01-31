@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\HasApiTokens;
+use Config;
+use Carbon\Carbon;
 
 /**
  * User model class.
@@ -27,21 +29,23 @@ class User extends Authenticatable
      *
      * @var array
      */
-    protected $fillable = ['name', 'email', 'password', 'phone_number', 'active'];
+    protected $fillable = ['name', 'email', 'password', 'phone_number', 'active',
+        'activation_code', 'activation_code_created_at'];
 
     /**
      * The attributes that should be hidden for arrays.
      *
      * @var array
      */
-    protected $hidden = ['password', 'remember_token', 'deleted_at'];
+    protected $hidden = ['password', 'remember_token', 'deleted_at', 'activation_code', 
+        'activation_code_created_at'];
 
     /**
      * Cast to Carbon dates.
      *
      * @var array
      */
-    protected $dates = ['deleted_at'];
+    protected $dates = ['deleted_at', 'activation_code_expires_at'];
 
     /**
      * Casting fields to php types.
@@ -95,5 +99,27 @@ class User extends Authenticatable
     {
         // TODO: ensure that username is a unique field
         return $this->active()->where(username_field($username), $username)->first();
+    }
+
+    public function activate(int $code)
+    {
+        if(is_null($this->activation_code_expires_at))
+            return false;
+        if(new Carbon > $this->activation_code_expires_at)
+            return false;
+        if($this->activation_code != $code)
+            return false;
+        $this->active = true;
+        $this->activation_code = NULL;
+        $this->activation_code_expires_at = NULL;
+        return true;
+    }
+
+    public function requestActivation()
+    {
+        $this->activation_code = rand(1000, 9999);
+        $this->activation_code_expires_at = (new Carbon)
+                ->addHours(Config::get('selefni.activation_code.lifetime'));
+        return $this;
     }
 }

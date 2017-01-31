@@ -60,6 +60,7 @@ class UserServiceTest extends TestCase
         $this->seeInDatabase('users', array_except($data, 'password'));
         $this->assertTrue(Hash::check($data['password'], $user->password));
         $this->assertEquals(false, $user->active);
+        $this->assertNotNull($user->activation_code);
     }
 
     public function testUpdate()
@@ -78,7 +79,15 @@ class UserServiceTest extends TestCase
     public function testActivate()
     {
         $user = $this->storeUser();
-        $user2 = $this->userService->activate($user->id);
+        $user2 = $this->userService->activate($user->id, $user->activation_code);
+        $this->assertEquals(true, $user2->active);
+    }
+
+    public function testActivateFails()
+    {
+        $this->setExpectedException('App\Exceptions\ActivationCodeExpiredException');
+        $user = $this->storeUser();
+        $user2 = $this->userService->activate($user->id, 1);
         $this->assertEquals(true, $user2->active);
     }
 
