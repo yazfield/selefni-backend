@@ -15,6 +15,12 @@ class EventServiceProvider extends ServiceProvider
         'App\Events\UserEvents\UserSubscribedEvent' => [
             'App\Listeners\User\UserActivationEmail',
         ],
+        'Illuminate\Notifications\Events\NotificationSending' => [
+            'App\Listeners\NotificationSendingListener',
+        ],
+        'Illuminate\Notifications\Events\NotificationSent' => [
+            'App\Listeners\NotificationSentListener',
+        ],
     ];
 
     /**

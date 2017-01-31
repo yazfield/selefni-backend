@@ -2,11 +2,11 @@
 
 namespace App;
 
-use Laravel\Passport\HasApiTokens;
 use Illuminate\Contracts\Hashing\Hasher;
-use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Laravel\Passport\HasApiTokens;
 
 /**
  * User model class.
@@ -93,6 +93,7 @@ class User extends Authenticatable
      */
     public function findForPassport($username)
     {
+        // TODO: ensure that username is a unique field
         return $this->active()->where(username_field($username), $username)->first();
     }
 }
