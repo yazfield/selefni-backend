@@ -100,7 +100,7 @@ class User extends Authenticatable
         // TODO: ensure that username is a unique field
         return $this->active()->where(username_field($username), $username)->first();
     }
-
+    # TODO: take out to a trait
     public function activate(int $code)
     {
         if(is_null($this->activation_code_expires_at))
@@ -121,5 +121,15 @@ class User extends Authenticatable
         $this->activation_code_expires_at = (new Carbon)
                 ->addHours(Config::get('selefni.activation_code.lifetime'));
         return $this;
+    }
+
+    public function borrowed()
+    {
+        return $this->hasMany('App\Item', 'borrowed_to');
+    }
+
+    public function lent()
+    {
+        return $this->hasMany('App\Item', 'borrowed_from');
     }
 }
