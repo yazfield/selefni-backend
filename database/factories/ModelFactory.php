@@ -11,6 +11,8 @@
 |
 */
 
+use Carbon\Carbon;
+
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
 $factory->define(App\User::class, function (Faker\Generator $faker) {
     static $password;
@@ -29,7 +31,8 @@ $factory->define(App\Item::class, function (Faker\Generator $faker) {
     return [
         'name' => preg_replace('/[^a-z ]/', '', strtolower($faker->name)),
         'details' => $faker->text,
-        'return_at' => $faker->dateTime,
+        'return_at' => (new Carbon)->toDateTimeString(),
+        'type' => 'object',
         'borrowed_to' => 1,
         'borrowed_from' => 2,
     ];

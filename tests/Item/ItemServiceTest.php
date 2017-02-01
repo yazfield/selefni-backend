@@ -2,6 +2,7 @@
 
 use App\Services\Contracts\ItemService;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Carbon\Carbon;
 
 class ItemServiceTest extends TestCase
 {
@@ -15,15 +16,15 @@ class ItemServiceTest extends TestCase
         $this->itemService = app(ItemService::class);
     }
 
-    private function storeUserData()
+    private function storeItemData()
     {
         # TODO: set other fields + borrowed to ..etc
         return [
             'name' => 'mock',
             'details' => 'mock det',
             'return_at' => (new Carbon)->toDateTimeString(),
-            'borrowed_to' => 1,
-            'borrowed_from' => 2,
+            'borrowed_to' => '1',
+            'borrowed_from' => '2',
         ];
     }
 
@@ -49,13 +50,9 @@ class ItemServiceTest extends TestCase
 
     public function testPaginate()
     {
-        $user = $this->storeUser();
-        $user2 = $this->userService->findBy('phone_number', '213666666666');
-        $user3 = $this->userService->findBy('email', 'mock@email.com');
-        $user4 = $this->userService->findBy('id', $user->id);
-        $this->assertEquals($user->toArray(), $user2->toArray());
-        $this->assertEquals($user->toArray(), $user3->toArray());
-        $this->assertEquals($user->toArray(), $user4->toArray());
+        $item = $this->storeItem();
+        $pagination = $this->itemService->paginate()->toArray();
+        $this->assertEquals($item->toArray(), array_except($pagination['data'][0], ['amount', 'type']));
     }
 
 }

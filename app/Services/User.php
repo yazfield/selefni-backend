@@ -21,6 +21,7 @@ use App\Exceptions\ActivationCodeExpiredException;
  */
 class User implements UserServiceContract
 {
+    use CommonServiceMethods;
     /**
      * @var UserModel
      */
@@ -94,22 +95,6 @@ class User implements UserServiceContract
         }
 
         return $this->returnOrThrow($result->first());
-    }
-
-    /**
-     * Throws exception if $result is null or returns $result.
-     *
-     * @param UserModel|null $result
-     *
-     * @return UserModel
-     */
-    private function returnOrThrow($result)
-    {
-        if (is_null($result)) {
-            throw new ModelNotFoundException;
-        }
-
-        return $result;
     }
 
     public function activate($id, int $code)

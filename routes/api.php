@@ -14,3 +14,5 @@
 
 Route::resource('/users', 'UsersController'); //->middleware('auth:api');
 Route::any('/users/{id}/activate/{code}', 'UsersController@activate')->name('activate_user');
+
+Route::resource('/items', 'ItemsController'); //->middleware('auth:api');
