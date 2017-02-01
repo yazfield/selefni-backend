@@ -23,3 +23,14 @@ $factory->define(App\User::class, function (Faker\Generator $faker) {
         'phone_number' => $faker->unique()->e164PhoneNumber,
     ];
 });
+
+$factory->define(App\Item::class, function (Faker\Generator $faker) {
+    #TODO: borrowed_to, other fields..
+    return [
+        'name' => preg_replace('/[^a-z ]/', '', strtolower($faker->name)),
+        'details' => $faker->text,
+        'return_at' => $faker->dateTime,
+        'borrowed_to' => 1,
+        'borrowed_from' => 2,
+    ];
+});

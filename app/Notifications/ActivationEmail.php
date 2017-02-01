@@ -47,10 +47,7 @@ class ActivationEmail extends Notification
             ->line('The introduction to the notification.')
             ->action('Notification Action','https://laravel.com')
             ->line('Thank you for using our application!')
-            ->action('Activate your account', route('activate_user', [
-                'code' => $notifiable->activation_code,
-                'id' => $notifiable->id,
-            ]));
+            ->line(sprintf('Activate your account with this code: %d', $notifiable->activation_code));
     }
 
     /**
