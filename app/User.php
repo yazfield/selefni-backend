@@ -120,6 +120,7 @@ class User extends Authenticatable
         $this->activation_code = rand(1000, 9999);
         $this->activation_code_expires_at = (new Carbon)
                 ->addHours(Config::get('selefni.activation_code.lifetime'));
+        $this->active = false;
         return $this;
     }
 
