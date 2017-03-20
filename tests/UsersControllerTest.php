@@ -1,5 +1,7 @@
 <?php
 
+namespace Tests;
+
 use App\Services\Contracts\UserService;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 
@@ -28,46 +30,46 @@ class UsersControllerTest extends TestCase
     }
     public function testStore()
     {
-        $user = factory(App\User::class)->make();
+        $user = factory(\App\User::class)->make();
         $data = array_add($user->toArray(), 'password', 'mysecret');
-        $this->json('POST', 'api/users', $data)->seeJsonContains(array_except($data, 'password'));
+        $this->json('POST', 'api/users', $data)->assertJson(array_except($data, 'password'));
     }
 
     public function testValidationFails()
     {
-        $data = factory(App\User::class)->make()->toArray();
-        $this->json('POST', 'api/users', $data)->seeJsonStructure(['message'])->seeStatusCode(400);
+        $data = factory(\App\User::class)->make()->toArray();
+        $this->json('POST', 'api/users', $data)->assertJsonStructure(['message'])->assertStatus(400);
     }
 
     public function testShow()
     {
-        $user = factory(App\User::class)->make();
+        $user = factory(\App\User::class)->make();
         $data = array_add($user->toArray(), 'password', 'mysecret');
         $this->json('POST', 'api/users', $data);
-        $this->json('GET', "api/users/{$data['email']}")->seeJsonContains(array_except($data, 'password'));
+        $this->json('GET', "api/users/{$data['email']}")->assertJson(array_except($data, 'password'));
     }
 
     public function testNotFound()
     {
-        $this->json('GET', 'api/users/blah')->seeJsonStructure(['message'])->seeStatusCode(404);
+        $this->json('GET', 'api/users/blah')->assertJsonStructure(['message'])->assertStatus(404);
     }
 
     public function testUpdate()
     {
-        $user = factory(App\User::class)->make();
+        $user = factory(\App\User::class)->make();
         $data = array_add($user->toArray(), 'password', 'mysecret');
         $this->json('POST', 'api/users', $data);
         $data['name'] = 'updated';
         $this->json('PUT', "api/users/{$data['email']}",
-            array_only($data, ['name']))->seeJsonContains(array_except($data, 'password'));
+            array_only($data, ['name']))->assertJson(array_except($data, 'password'));
     }
 
     public function testDestroy()
     {
-        $user = factory(App\User::class)->make();
+        $user = factory(\App\User::class)->make();
         $data = array_add($user->toArray(), 'password', 'mysecret');
         $this->json('POST', 'api/users', $data);
-        $this->json('DELETE', "api/users/{$data['email']}")->seeJsonStructure(['message'])->seeStatusCode(200);
+        $this->json('DELETE', "api/users/{$data['email']}")->assertJsonStructure(['message'])->assertStatus(200);
     }
 
     public function testActivate()
@@ -76,7 +78,7 @@ class UsersControllerTest extends TestCase
         $this->json('GET', route('activate_user', [
             'id' => $user->id,
             'code' => $user->activation_code
-        ]))->seeJsonStructure(['message'])->seeStatusCode(200);
+        ]))->assertJsonStructure(['message'])->assertStatus(200);
     }
 
     public function testActivateFails()
@@ -85,6 +87,6 @@ class UsersControllerTest extends TestCase
         $this->json('GET', route('activate_user', [
             'id' => $user->id,
             'code' => 1,
-        ]))->seeJsonStructure(['message'])->seeStatusCode(300);
+        ]))->assertJsonStructure(['message'])->assertStatus(300);
     }
 }

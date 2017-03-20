@@ -1,8 +1,11 @@
 <?php
 
+namespace Tests\Item;
+
 use App\Services\Contracts\ItemService;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Carbon\Carbon;
+use Tests\TestCase;
 
 class ItemsControllerTest extends TestCase
 {
@@ -36,21 +39,21 @@ class ItemsControllerTest extends TestCase
 
     public function testStore()
     {
-        $item = factory(App\Item::class)->make()->toArray();
-        $this->json('POST', 'api/items', $item)->seeJsonContains($item);
+        $item = factory(\App\Item::class)->make()->toArray();
+        $this->json('POST', 'api/items', $item)->assertJson($item);
     }
 
     /*public function testShow()
     {
         $item = factory(App\Item::class)->make();
         $this->json('POST', 'api/items', $item);
-        $this->json('GET', "api/items/{$item['id']}")->seeJsonContains($items);
+        $this->json('GET', "api/items/{$item['id']}")->assertJson($items);
     }
     */
     public function testIndex()
     {
         $item = $this->storeItem()->toArray();
-        $this->json('GET', "api/items")->seeJsonContains(['data' => [$item]]);
+        $this->json('GET', "api/items")->assertJson(['data' => [$item]]);
     }
 
 }

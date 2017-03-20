@@ -1,8 +1,11 @@
 <?php
 
+namespace Tests\Item;
+
 use App\Services\Contracts\ItemService;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Carbon\Carbon;
+use Tests\TestCase;
 
 class ItemServiceTest extends TestCase
 {
@@ -36,9 +39,9 @@ class ItemServiceTest extends TestCase
     public function testStore()
     {
         $item = $this->storeItem();
-        $this->assertTrue($item instanceof App\Item);
+        $this->assertTrue($item instanceof \App\Item);
         $data = $this->storeItemData();
-        $this->seeInDatabase('items', $data);
+        $this->assertDatabaseHas('items', $data);
     }
 
     public function testFind()
