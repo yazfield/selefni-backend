@@ -1,5 +1,7 @@
 <?php
 
+namespace Tests;
+
 use App\Services\Contracts\UserService;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 
@@ -55,12 +57,22 @@ class UserServiceTest extends TestCase
     public function testStoreUser()
     {
         $user = $this->storeUser();
-        $this->assertTrue($user instanceof App\User);
+        $this->assertTrue($user instanceof \App\User);
         $data = $this->storeUserData();
-        $this->seeInDatabase('users', array_except($data, 'password'));
-        $this->assertTrue(Hash::check($data['password'], $user->password));
+        $this->assertDatabaseHas('users', array_except($data, 'password'));
+        $this->assertTrue(\Hash::check($data['password'], $user->password));
         $this->assertEquals(false, $user->active);
         $this->assertNotNull($user->activation_code);
+    }
+
+    public function testStoreDeletedUser()
+    {
+        $oldUser = $this->storeUser();
+        $oldUser = $this->userService->activate($oldUser->id, $oldUser->activation_code);
+        $oldUser->delete();
+        $user = $this->storeUser();
+        $this->assertEquals($oldUser->id, $user->id);
+        $this->assertEquals(false, $user->active);
     }
 
     public function testUpdate()
@@ -73,7 +85,7 @@ class UserServiceTest extends TestCase
             'phone_number' => '213666666669',
         ];
         $user2 = $this->userService->update($user, $data);
-        $this->seeInDatabase('users', array_except($data, 'password'));
+        $this->assertDatabaseHas('users', array_except($data, 'password'));
     }
 
     public function testActivate()
