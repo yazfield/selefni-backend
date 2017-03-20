@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use Illuminate\Http\{Request,JsonResponse};
 use App\Services\Contracts\UserService;
-use App\Exceptions\ActivationCodeExpiredException;
+use App\Exceptions\{ActivationCodeExpiredException, EmailAlreadyExistsException};
+use App\Exceptions\PhoneNumberAlreadyExistsException;
 
 /**
  * Class UsersController.
@@ -24,7 +25,6 @@ class UsersController extends Controller
     /**
      * UsersController constructor.
      *
-     * @param UserService $userService
      */
     public function __construct(UserService $userService)
     {
@@ -33,82 +33,56 @@ class UsersController extends Controller
     }
 
     /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
      * Store a newly created resource in storage.
      * This could be either a user subscription
      * or a user created to hold items relation.
      *
-     * @param  \Illuminate\Http\Request $request
-
-     * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $request) : JsonResponse
     {
         $validator = $this->validator->make($request->all(), [
-            'email' => 'required|email|unique:users',
+            'email' => 'required|email',
             'password' => 'required|min:8',
             'name' => 'required|regex:/^[\pL\s\-]+$/u|min:3',
-            'phone_number' => "sometimes|unique:users|regex:/^\(?\+?([0-9]{1,4})\)?[-\. ]?(\d{3})[-\. ]?([0-9]{7})$/u",
+            'phone_number' => "sometimes|regex:/^\(?\+?([0-9]{1,4})\)?[-\. ]?(\d{3})[-\. ]?([0-9]{7})$/u",
         ]);
         if ($validator->fails()) {
-            return response()->json(['message' => $validator->messages()], 400);
+            return response()->json(['errors' => $validator->messages()], 400);
         }
-
-        return response()->json($this->userService->store($request->all())->toArray());
+        try {
+            $user = $this->userService->store($request->all());
+        } catch (EmailAlreadyExistsException $e) {
+            $errors = [
+                'email' => 'The email elready exists'
+            ];
+            return response()->json(['errors' => $errors], 400);
+        } catch (PhoneNumberAlreadyExistsException $e) {
+            $errors = [
+                'phone_number' => 'The phone number elready exists'
+            ];
+            return response()->json(['errors' => $errors], 400);
+        }
+        
+        return response()->json($user->toArray());
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  int $id
-     *
-     * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($id) : JsonResponse
     {
-        return $this->userService->find($id);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int $id
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
+        $user = $this->userService->find($id);
+        return response()->json($user->toArray());
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request $request
-     * @param  int                      $id
+     * @param  int $id
      *
-     * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, $id) : JsonResponse
     {
         $user = $this->userService->find($id);
         $validator = $this->validator->make($request->all(), [
@@ -121,17 +95,16 @@ class UsersController extends Controller
             return response()->json(['message' => $validator->messages()], 400);
         }
 
-        return $this->userService->update($user, $request->all());
+        $user = $this->userService->update($user, $request->all());
+        return response()->json($user->toArray());
     }
 
     /**
      * Remove the specified resource from storage.
      *
      * @param  int $id
-     *
-     * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($id) : JsonResponse
     {
         if ($this->userService->destroy($id)) {
             return response()->json([
@@ -142,11 +115,12 @@ class UsersController extends Controller
         // TODO: return this message in handler whatever error it is in production
         // make it an exception
         return response()->json([
-            'message' => 'Server error',
+            'error' => 'Server error',
         ], 500);
     }
 
-    public function activate($id, $code)
+    // TODO: this should be a html page not json
+    public function activate($id, $code) : JsonResponse
     {
         $code = intval($code);
         try {
@@ -156,7 +130,7 @@ class UsersController extends Controller
             ], 200);
         } catch(ActivationCodeExpiredException $e) {
             return response()->json([
-                'message' => 'Activation code has expired',
+                'error' => 'Activation code has expired',
             ], 300);
         }
     }

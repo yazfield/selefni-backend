@@ -49,7 +49,7 @@ class Handler extends ExceptionHandler
     {
         if ($exception instanceof ModelNotFoundException) {
             return response()->json([
-                'message' => 'Record not found',
+                'error' => 'Record not found',
             ], 404);
         }
 

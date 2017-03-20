@@ -19,7 +19,7 @@ class UsersControllerTest extends TestCase
         return [
             'name' => 'mock',
             'email' => 'mock@email.com',
-            'password' => 'mock',
+            'password' => 'mockmock',
             'phone_number' => '213666666666',
         ];
     }
@@ -35,10 +35,18 @@ class UsersControllerTest extends TestCase
         $this->json('POST', 'api/users', $data)->assertJson(array_except($data, 'password'));
     }
 
+    public function testStoreDeleted()
+    {
+        $user = $this->storeUser();
+        $user->delete();
+        $result = $this->json('POST', 'api/users', $this->storeUserData());
+        $result->assertJson(array_except($this->storeUserData(), 'password'));
+    }
+
     public function testValidationFails()
     {
         $data = factory(\App\User::class)->make()->toArray();
-        $this->json('POST', 'api/users', $data)->assertJsonStructure(['message'])->assertStatus(400);
+        $this->json('POST', 'api/users', $data)->assertJsonStructure(['errors'])->assertStatus(400);
     }
 
     public function testShow()
@@ -51,7 +59,7 @@ class UsersControllerTest extends TestCase
 
     public function testNotFound()
     {
-        $this->json('GET', 'api/users/blah')->assertJsonStructure(['message'])->assertStatus(404);
+        $this->json('GET', 'api/users/blah')->assertJsonStructure(['error'])->assertStatus(404);
     }
 
     public function testUpdate()
@@ -87,6 +95,6 @@ class UsersControllerTest extends TestCase
         $this->json('GET', route('activate_user', [
             'id' => $user->id,
             'code' => 1,
-        ]))->assertJsonStructure(['message'])->assertStatus(300);
+        ]))->assertJsonStructure(['error'])->assertStatus(300);
     }
 }

@@ -14,7 +14,8 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use App\Services\Contracts\UserService as UserServiceContract;
 use Carbon\Carbon;
 use Config;
-use App\Exceptions\ActivationCodeExpiredException;
+use App\Exceptions\{ActivationCodeExpiredException, EmailAlreadyExistsException};
+use App\Exceptions\PhoneNumberAlreadyExistsException;
 
 /**
  * User Service class.
@@ -41,6 +42,14 @@ class User implements UserServiceContract
                 break;
             } catch (\Exception $e) {
                 $user = null;
+            }
+        }
+        if(! is_null($user) && !$user->trashed()) {
+            if($user->email == $data['email']) {
+                throw new EmailAlreadyExistsException();
+            }
+            if($user->phone_number == $data['phone_number']) {
+                throw new PhoneNumberAlreadyExistsException();
             }
         }
         if (! is_null($user) && $user->trashed()) {

@@ -4,6 +4,7 @@ namespace Tests;
 
 use App\Services\Contracts\UserService;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
+use App\Exceptions\{ActivationCodeExpiredException, EmailAlreadyExistsException};
 
 class UserServiceTest extends TestCase
 {
@@ -22,7 +23,7 @@ class UserServiceTest extends TestCase
         return [
             'name' => 'mock',
             'email' => 'mock@email.com',
-            'password' => 'mock',
+            'password' => 'mockmock',
             'phone_number' => '213666666666',
         ];
     }
@@ -75,6 +76,13 @@ class UserServiceTest extends TestCase
         $this->assertEquals(false, $user->active);
     }
 
+    public function testStoreExistingUser()
+    {
+        $this->setExpectedException(EmailAlreadyExistsException::class);
+        $oldUser = $this->storeUser();
+        $user = $this->storeUser();
+    }
+
     public function testUpdate()
     {
         $user = $this->storeUser();
@@ -97,7 +105,7 @@ class UserServiceTest extends TestCase
 
     public function testActivateFails()
     {
-        $this->setExpectedException('App\Exceptions\ActivationCodeExpiredException');
+        $this->setExpectedException(ActivationCodeExpiredException::class);
         $user = $this->storeUser();
         $user2 = $this->userService->activate($user->id, 1);
         $this->assertEquals(true, $user2->active);
