@@ -23,11 +23,18 @@ use App\Exceptions\PhoneNumberAlreadyExistsException;
 class User implements UserServiceContract
 {
     use CommonServiceMethods;
-    use InjectUserModel;
+    use InjectModel;
 
     public function __construct(UserModel $model)
     {
         $this->setModel($model);
+    }
+
+    public function createUserWithoutAccount(array $data) : UserModel
+    {
+        $user = new $this->model($data);
+        $user->save();
+        return $user;
     }
 
     public function store(array $data) : UserModel
@@ -82,17 +89,7 @@ class User implements UserServiceContract
         return $user;
     }
 
-    public function findBy($field, $value, $includeTrashed = false) : UserModel
-    {
-        $result = $this->model->where($field, $value);
-        if ($includeTrashed) {
-            $result = $result->withTrashed();
-        }
-
-        return $this->returnOrThrow($result->first());
-    }
-
-    public function find($id, $includeTrashed = false) : UserModel
+    public function find($id, bool $includeTrashed = false) : UserModel
     {
         return $this->findBy(username_field($id), $id, $includeTrashed);
     }
@@ -107,7 +104,7 @@ class User implements UserServiceContract
         return $result;
     }
 
-    public function deactivate($id)
+    public function deactivate($id) : UserModel
     {
         throw new \Exception('TODO: Implement deactivate() method.');
     }
@@ -120,7 +117,7 @@ class User implements UserServiceContract
         return $result;
     }
 
-    public function destroy($id)
+    public function destroy($id) : bool
     {
         $user = $id instanceof UserModel ? $id : $this->find($id);
         $user->active = false;
