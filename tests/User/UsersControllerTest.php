@@ -2,7 +2,6 @@
 
 namespace Tests\User;
 
-use App\Services\Contracts\UserService;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 
 class UsersControllerTest extends \Tests\TestCase
@@ -68,7 +67,7 @@ class UsersControllerTest extends \Tests\TestCase
         $user = $this->storeUser();
         $this->json('GET', route('activate_user', [
             'id' => $user->id,
-            'code' => $user->activation_code
+            'code' => $user->activation_code,
         ]))->assertJsonStructure(['message'])->assertStatus(200);
     }
 

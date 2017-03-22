@@ -45,7 +45,7 @@ class ActivationEmail extends Notification
         // TODO: setup lang files and email views
         return (new MailMessage)->greeting('Hello,')
             ->line('The introduction to the notification.')
-            ->action('Notification Action','https://laravel.com')
+            ->action('Notification Action', 'https://laravel.com')
             ->line('Thank you for using our application!')
             ->line(sprintf('Activate your account with this code: %d', $notifiable->activation_code));
     }

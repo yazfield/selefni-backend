@@ -2,10 +2,10 @@
 
 namespace Tests\Item;
 
-use App\Services\Contracts\ItemService;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Carbon\Carbon;
 use Tests\TestCase;
+use App\Services\Contracts\ItemService;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
 
 class ItemsControllerTest extends TestCase
 {
@@ -21,7 +21,7 @@ class ItemsControllerTest extends TestCase
 
     private function storeItemData()
     {
-        # TODO: set other fields + borrowed to ..etc
+        // TODO: set other fields + borrowed to ..etc
         return [
             'name' => 'mock',
             'details' => 'mock det',
@@ -53,7 +53,6 @@ class ItemsControllerTest extends TestCase
     public function testIndex()
     {
         $item = $this->storeItem()->toArray();
-        $this->json('GET', "api/items")->assertJson(['data' => [$item]]);
+        $this->json('GET', 'api/items')->assertJson(['data' => [$item]]);
     }
-
 }

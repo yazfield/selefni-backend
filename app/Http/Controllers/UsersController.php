@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\{Request,JsonResponse};
+use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use App\Services\Contracts\UserService;
-use App\Exceptions\{ActivationCodeExpiredException, EmailAlreadyExistsException};
+use App\Exceptions\EmailAlreadyExistsException;
+use App\Exceptions\ActivationCodeExpiredException;
 use App\Exceptions\PhoneNumberAlreadyExistsException;
 
 /**
@@ -24,7 +26,6 @@ class UsersController extends Controller
 
     /**
      * UsersController constructor.
-     *
      */
     public function __construct(UserService $userService)
     {
@@ -36,7 +37,6 @@ class UsersController extends Controller
      * Store a newly created resource in storage.
      * This could be either a user subscription
      * or a user created to hold items relation.
-     *
      */
     public function store(Request $request) : JsonResponse
     {
@@ -53,26 +53,28 @@ class UsersController extends Controller
             $user = $this->userService->store($request->all());
         } catch (EmailAlreadyExistsException $e) {
             $errors = [
-                'email' => 'The email elready exists'
+                'email' => 'The email elready exists',
             ];
+
             return response()->json(['errors' => $errors], 400);
         } catch (PhoneNumberAlreadyExistsException $e) {
             $errors = [
-                'phone_number' => 'The phone number elready exists'
+                'phone_number' => 'The phone number elready exists',
             ];
+
             return response()->json(['errors' => $errors], 400);
         }
-        
+
         return response()->json($user->toArray());
     }
 
     /**
      * Display the specified resource.
-     *
      */
     public function show($id) : JsonResponse
     {
         $user = $this->userService->find($id);
+
         return response()->json($user->toArray());
     }
 
@@ -80,7 +82,6 @@ class UsersController extends Controller
      * Update the specified resource in storage.
      *
      * @param  int $id
-     *
      */
     public function update(Request $request, $id) : JsonResponse
     {
@@ -96,6 +97,7 @@ class UsersController extends Controller
         }
 
         $user = $this->userService->update($user, $request->all());
+
         return response()->json($user->toArray());
     }
 
@@ -125,10 +127,11 @@ class UsersController extends Controller
         $code = intval($code);
         try {
             $this->userService->activate($id, $code);
+
             return response()->json([
                 'message' => 'User activated',
             ], 200);
-        } catch(ActivationCodeExpiredException $e) {
+        } catch (ActivationCodeExpiredException $e) {
             return response()->json([
                 'error' => 'Activation code has expired',
             ], 300);

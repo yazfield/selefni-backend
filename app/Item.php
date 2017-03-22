@@ -6,8 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Item extends Model
 {
-    protected $fillable = ['name', 'details', 'amount', 'type', 'return_at', 
-        'borrowed_to', 'borrowed_from'];
+    protected $fillable = ['name', 'details', 'amount', 'type', 'return_at',
+        'borrowed_to', 'borrowed_from', ];
     protected $hidden = ['deleted_at'];
 
     public function borrowedFrom()

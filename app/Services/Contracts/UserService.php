@@ -22,7 +22,6 @@ interface UserService
      * @param mixed $id             User identifier, should be unique.
      *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
-     *
      */
     public function find($id, bool $includeTrashed = false) : User;
 

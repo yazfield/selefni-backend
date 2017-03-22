@@ -1,4 +1,5 @@
 <?php
+
 namespace Tests;
 
 abstract class BrowserKitTest extends \Laravel\BrowserKitTesting\TestCase

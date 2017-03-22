@@ -3,8 +3,9 @@
 namespace Tests\User;
 
 use App\Services\Contracts\UserService;
+use App\Exceptions\EmailAlreadyExistsException;
+use App\Exceptions\ActivationCodeExpiredException;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
-use App\Exceptions\{ActivationCodeExpiredException, EmailAlreadyExistsException};
 
 class UserServiceTest extends \Tests\TestCase
 {
