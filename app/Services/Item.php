@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Item as ItemModel;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use App\Services\Contracts\ItemService as ItemServiceContract;
+use App\Services\Contracts\UserService as UserServiceContract;
 use Carbon\Carbon;
 
 /**
@@ -13,12 +14,7 @@ use Carbon\Carbon;
 class Item implements ItemServiceContract
 {
     use CommonServiceMethods;
-
-    /**
-     * @var ItemModel
-     */
-    private $model;
-
+    use InjectModel;
     /**
      * Item constructor.
      *
@@ -29,49 +25,49 @@ class Item implements ItemServiceContract
         $this->setModel($model);
     }
 
-    /**
-     * @return ItemModel
-     */
-    public function getModel()
+    public function find($id, bool $includeTrashed = false) : ItemModel
     {
-        return $this->model;
-    }
+        $q = $this->model->with('borrowedTo', 'borrowedFrom');
+        if($includeTrashed) {
+            $q = $q->withTrashed();
+        }
+        $item = $q->find($id);
 
-    /**
-     * @param ItemModel $model
-     */
-    public function setModel(ItemModel $model)
-    {
-        $this->model = $model;
-    }
-
-    public function find($id, $includeTrashed = false)
-    {
-
-    }
-
-    public function findBy($field, $value, $includeTrashed = false)
-    {
-
+        return $this->returnOrThrow($item);
     }
 
     public function paginate(int $perPage=15)
     {
-        return $this->model->paginate($perPage);
+        return $this->model->with('borrowedTo', 'borrowedFrom')->paginate($perPage);
     }
 
-    public function store(array $data)
+    /**
+     * data['new_user'] = 'borrowed_from' or 'borrowed_to'
+     * data['borrowed_from_data'] = user data
+     * TODO: find a way to avoid this coupling
+     */
+    public function store(array $data) : ItemModel
     {
+        $userService = app(UserServiceContract::class);
+        if(isset($data['new_user'])) {
+            $userData = $data[$data['new_user'] . '_data'];
+            $user = $userService->createUserWithoutAccount($userData);
+            $data[$data['new_user']] = $user->id;
+        }
         return $this->model->create($data);
     }
 
-    public function update($id, array $data)
+    public function update($id, array $data) : ItemModel
     {
-
+        $item = $this->find($id);
+        $item->fill($data)
+            ->save();
+        return $item;
     }
 
-    public function destroy($id)
+    public function destroy($id) : bool
     {
-
+        $item = $this->find($id);
+        return $item->delete();
     }
 }
