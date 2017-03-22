@@ -23,4 +23,14 @@ trait CommonServiceMethods
 
         return $result;
     }
+
+    public function findBy(string $field, $value, bool $includeTrashed = false)
+    {
+        $result = $this->model->where($field, $value);
+        if ($includeTrashed) {
+            $result = $result->withTrashed();
+        }
+
+        return $this->returnOrThrow($result->first());
+    }
 }
