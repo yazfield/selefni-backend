@@ -7,7 +7,7 @@ use App\Services\Contracts\ItemService;
 
 class ItemsController extends Controller
 {
-     /**
+    /**
      * @var ItemService
      */
     public $itemService;
@@ -56,13 +56,13 @@ class ItemsController extends Controller
      */
     public function store(Request $request)
     {
-         #TODO: borrowed exists..
+        //TODO: borrowed exists..
         $validator = $this->validator->make($request->all(), [
-            'name' => 'required', 
+            'name' => 'required',
             'details' => 'sometimes',
             'amount' => 'sometimes|integer',
-            'type' => 'required', 
-            'return_at' => 'required|date', 
+            'type' => 'required',
+            'return_at' => 'required|date',
             'borrowed_to' => 'required',
             'borrowed_from' => 'required',
         ]);

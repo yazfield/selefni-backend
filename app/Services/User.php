@@ -10,12 +10,10 @@ namespace App\Services;
 
 use App\User as UserModel;
 use App\Events\UserEvents\UserSubscribedEvent;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
-use App\Services\Contracts\UserService as UserServiceContract;
-use Carbon\Carbon;
-use Config;
-use App\Exceptions\{ActivationCodeExpiredException, EmailAlreadyExistsException};
+use App\Exceptions\EmailAlreadyExistsException;
+use App\Exceptions\ActivationCodeExpiredException;
 use App\Exceptions\PhoneNumberAlreadyExistsException;
+use App\Services\Contracts\UserService as UserServiceContract;
 
 /**
  * User Service class.
@@ -34,6 +32,7 @@ class User implements UserServiceContract
     {
         $user = new $this->model($data);
         $user->save();
+
         return $user;
     }
 
@@ -51,21 +50,23 @@ class User implements UserServiceContract
                 $user = null;
             }
         }
-        if(! is_null($user) && !$user->trashed()) {
-            if($user->email == $data['email']) {
+        if (! is_null($user) && ! $user->trashed()) {
+            if ($user->email == $data['email']) {
                 throw new EmailAlreadyExistsException();
             }
-            if($user->phone_number == $data['phone_number']) {
+            if ($user->phone_number == $data['phone_number']) {
                 throw new PhoneNumberAlreadyExistsException();
             }
         }
         if (! is_null($user) && $user->trashed()) {
             $user = $this->restoreUser($user, $data);
             event(new UserSubscribedEvent($user));
+
             return $user;
         }
         $user = $this->createUser($data);
         event(new UserSubscribedEvent($user));
+
         return $user;
     }
 
@@ -76,6 +77,7 @@ class User implements UserServiceContract
         $user
             ->requestActivation()
             ->save();
+
         return $user;
     }
 
@@ -86,6 +88,7 @@ class User implements UserServiceContract
         $user->fill($data)
             ->requestActivation()
             ->save();
+
         return $user;
     }
 
@@ -97,8 +100,9 @@ class User implements UserServiceContract
     public function activate($id, int $code) : UserModel
     {
         $result = $id instanceof UserModel ? $id : $this->find($id);
-        if(!$result->activate($code))
+        if (! $result->activate($code)) {
             throw new ActivationCodeExpiredException;
+        }
         $result->save();
 
         return $result;

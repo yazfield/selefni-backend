@@ -3,8 +3,6 @@
 namespace App\Listeners;
 
 use Illuminate\Notifications\Events\NotificationSending;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Contracts\Queue\ShouldQueue;
 
 class NotificationSendingListener
 {

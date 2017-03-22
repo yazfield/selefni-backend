@@ -3,7 +3,6 @@
 namespace App\Services\Contracts;
 
 use App\Item;
-use App\Services\Contracts\UserService;
 
 /**
  * Interface ItemService
@@ -65,9 +64,5 @@ interface ItemService
      */
     public function destroy($id) : bool;
 
-    /**
-     *
-     */
-    public function paginate(int $perPage=15);
-
+    public function paginate(int $perPage = 15);
 }

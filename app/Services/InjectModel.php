@@ -1,9 +1,9 @@
 <?php
 
 namespace App\Services;
-use App\User as UserModel;
 
-trait InjectModel {
+trait InjectModel
+{
     /**
      * @var Model
      */

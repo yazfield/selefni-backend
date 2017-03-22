@@ -13,7 +13,7 @@
 
 use Carbon\Carbon;
 
-/** @var \Illuminate\Database\Eloquent\Factory $factory */
+/* @var \Illuminate\Database\Eloquent\Factory $factory */
 $factory->define(App\User::class, function (Faker\Generator $faker) {
     static $password;
 
@@ -27,7 +27,7 @@ $factory->define(App\User::class, function (Faker\Generator $faker) {
 });
 
 $factory->define(App\Item::class, function (Faker\Generator $faker) {
-    #TODO: borrowed_to, other fields..
+    //TODO: borrowed_to, other fields..
     return [
         'name' => preg_replace('/[^a-z ]/', '', strtolower($faker->name)),
         'details' => $faker->text,

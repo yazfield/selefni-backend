@@ -2,11 +2,11 @@
 
 namespace Tests\Item;
 
+use Carbon\Carbon;
+use Tests\TestCase;
 use App\Services\Contracts\ItemService;
 use App\Services\Contracts\UserService;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
-use Carbon\Carbon;
-use Tests\TestCase;
 
 class ItemServiceTest extends TestCase
 {
@@ -25,7 +25,7 @@ class ItemServiceTest extends TestCase
 
     private function storeItemData()
     {
-        # TODO: set other fields + borrowed to ..etc
+        // TODO: set other fields + borrowed to ..etc
         $this->user = $this->user ?? $this->userService->store([
             'name' => 'mock',
             'email' => 'mock@email.com',
@@ -38,7 +38,7 @@ class ItemServiceTest extends TestCase
             'details' => 'mock det',
             'return_at' => (new Carbon)->toDateTimeString(),
             'borrowed_to' => (string) $this->user->id,
-            'borrowed_from' => (string)$this->user->id,
+            'borrowed_from' => (string) $this->user->id,
             'amount' => null,
             'type' => 'object',
         ];
@@ -47,6 +47,7 @@ class ItemServiceTest extends TestCase
     private function storeItem()
     {
         $this->item = $this->item ?? $this->itemService->store($this->storeItemData());
+
         return $this->item;
     }
 
@@ -85,5 +86,4 @@ class ItemServiceTest extends TestCase
         $pagination = $this->itemService->paginate()->toArray();
         $this->assertEquals($item->toArray(), $pagination['data'][0]);
     }
-
 }
