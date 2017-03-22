@@ -2,72 +2,71 @@
 
 namespace App\Services\Contracts;
 
+use App\Item;
+use App\Services\Contracts\UserService;
+
 /**
- * Interface UserService
- * All user related actions to be implemented by a UserService class.
+ * Interface ItemService
+ * All item related actions to be implemented by a ItemService class.
  */
 interface ItemService
 {
     /**
-     * Find a user by a unique identifier.
+     * Find an item by a unique identifier.
      *
-     * @param mixed $id             User identifier, should be unique.
+     * @param mixed $id             Item identifier, should be unique.
      * @param bool  $includeTrashed Include trashed if set to true
      *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      *
-     * @return \App\User user model if found.
+     * @return Item item model if found.
      */
-    public function find($id, $includeTrashed = false);
+    public function find($id, bool $includeTrashed = false) : Item;
 
     /**
      * Find a user by adding search criteria: where $field = $value.
      * $field should be unique because the method returs one row.
      *
-     * @param string $field          User table field name.
+     * @param string $field          Item table field name.
      * @param mixed  $value          $field value
      * @param bool   $includeTrashed Include trashed if set to true
      *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      *
-     * @return \App\User user model if found.
+     * @return Item user model if found.
      */
-    public function findBy($field, $value, $includeTrashed = false);
+    public function findBy(string $field, $value, bool $includeTrashed = false);
 
     /**
-     * Store a new user.
+     * Store a new item.
      *
-     * @param array $data User data.
+     * @param array $data item data.
      *
-     * @return \App\User stored user model.
+     * @return Item stored item model.
      */
-    public function store(array $data);
+    public function store(array $data) : Item;
 
     /**
-     * Update user.
+     * Update item.
      *
-     * @param mixed $id \App\User model or user identifier
+     * @param mixed $id Item model or item identifier
      * @param array $data
      *
-     * @return \App\User
+     * @return Item
      */
-    public function update($id, array $data);
+    public function update($id, array $data) : Item;
 
     /**
-     * Destroy user.
+     * Destroy item.
      *
-     * @param mixed $id \App\User model or user identifier
+     * @param mixed $id Item model or item identifier
      *
-     * @return bool true if the user was deleted.
+     * @return bool true if the item was deleted.
      */
-    public function destroy($id);
+    public function destroy($id) : bool;
 
     /**
-     * Update user.
      *
-     * @param mixed $id \App\User model or user identifier
-     *
-     * @return \App\User
      */
     public function paginate(int $perPage=15);
 

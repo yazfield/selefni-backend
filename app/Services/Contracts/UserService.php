@@ -8,6 +8,8 @@
 
 namespace App\Services\Contracts;
 
+use App\User;
+
 /**
  * Interface UserService
  * All user related actions to be implemented by a UserService class.
@@ -18,13 +20,11 @@ interface UserService
      * Find a user by a unique identifier.
      *
      * @param mixed $id             User identifier, should be unique.
-     * @param bool  $includeTrashed Include trashed if set to true
      *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      *
-     * @return \App\User user model if found.
      */
-    public function find($id, $includeTrashed = false);
+    public function find($id, bool $includeTrashed = false) : User;
 
     /**
      * Find a user by adding search criteria: where $field = $value.
@@ -38,7 +38,7 @@ interface UserService
      *
      * @return \App\User user model if found.
      */
-    public function findBy($field, $value, $includeTrashed = false);
+    public function findBy(string $field, $value, bool $includeTrashed = false);
 
     /**
      * Store a new user.
@@ -47,7 +47,7 @@ interface UserService
      *
      * @return \App\User stored user model.
      */
-    public function store(array $data);
+    public function store(array $data) : User;
 
     /**
      * Activate user.
@@ -59,7 +59,7 @@ interface UserService
      *
      * @return \App\User
      */
-    public function activate($id, int $code);
+    public function activate($id, int $code) : User;
 
     /**
      * Deactivate user.
@@ -68,7 +68,7 @@ interface UserService
      *
      * @return \App\User
      */
-    public function deactivate($id);
+    public function deactivate($id) : User;
 
     /**
      * Update user.
@@ -78,7 +78,7 @@ interface UserService
      *
      * @return \App\User
      */
-    public function update($id, array $data);
+    public function update($id, array $data) : User;
 
     /**
      * Destroy user.
@@ -87,5 +87,5 @@ interface UserService
      *
      * @return bool true if the user was deleted.
      */
-    public function destroy($id);
+    public function destroy($id) : bool;
 }

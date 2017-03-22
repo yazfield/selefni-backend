@@ -38,7 +38,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $hidden = ['password', 'remember_token', 'deleted_at', 'activation_code', 
-        'activation_code_created_at'];
+        'activation_code_expires_at', 'active'];
 
     /**
      * Cast to Carbon dates.

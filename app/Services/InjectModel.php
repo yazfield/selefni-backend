@@ -3,24 +3,24 @@
 namespace App\Services;
 use App\User as UserModel;
 
-trait InjectUserModel {
+trait InjectModel {
     /**
-     * @var UserModel
+     * @var Model
      */
     private $model;
 
     /**
-     * @return UserModel
+     * @return Model
      */
-    public function getModel() : UserModel
+    public function getModel()
     {
         return $this->model;
     }
 
     /**
-     * @param UserModel $model
+     * @param Model $model
      */
-    public function setModel(UserModel $model)
+    public function setModel($model)
     {
         $this->model = $model;
     }

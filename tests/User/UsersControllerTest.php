@@ -1,33 +1,15 @@
 <?php
 
-namespace Tests;
+namespace Tests\User;
 
 use App\Services\Contracts\UserService;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 
-class UsersControllerTest extends TestCase
+class UsersControllerTest extends \Tests\TestCase
 {
     use DatabaseMigrations;
-    public function setUp()
-    {
-        parent::setUp();
-        $this->userService = app(UserService::class);
-    }
+    use UserTrait;
 
-    private function storeUserData()
-    {
-        return [
-            'name' => 'mock',
-            'email' => 'mock@email.com',
-            'password' => 'mockmock',
-            'phone_number' => '213666666666',
-        ];
-    }
-
-    private function storeUser()
-    {
-        return $this->userService->store($this->storeUserData());
-    }
     public function testStore()
     {
         $user = factory(\App\User::class)->make();
@@ -40,6 +22,7 @@ class UsersControllerTest extends TestCase
         $user = $this->storeUser();
         $user->delete();
         $result = $this->json('POST', 'api/users', $this->storeUserData());
+
         $result->assertJson(array_except($this->storeUserData(), 'password'));
     }
 

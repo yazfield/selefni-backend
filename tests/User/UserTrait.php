@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests;
+namespace Tests\User;
 
 use App\Services\Contracts\UserService;
 
@@ -19,7 +19,7 @@ trait UserTrait
         return [
             'name' => 'mock',
             'email' => 'mock@email.com',
-            'password' => 'mock',
+            'password' => 'mockmock',
             'phone_number' => '213666666666',
         ];
     }
