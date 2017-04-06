@@ -70,7 +70,9 @@ class ItemsController extends Controller
             return response()->json(['message' => $validator->messages()], 400);
         }
 
-        return response()->json($this->itemService->store($request->all())->toArray());
+        $result = $this->itemService->store($request->all());
+
+        return response()->json($result->toArray());
     }
 
     /**
@@ -81,7 +83,9 @@ class ItemsController extends Controller
      */
     public function show($id)
     {
-        //
+        $item = $this->itemService->find($id);
+
+        return response()->json($item->toArray());
     }
 
     /**

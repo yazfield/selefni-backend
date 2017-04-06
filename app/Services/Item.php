@@ -30,9 +30,7 @@ class Item implements ItemServiceContract
         if ($includeTrashed) {
             $q = $q->withTrashed();
         }
-        $item = $q->find($id);
-
-        return $this->returnOrThrow($item);
+        return $q->findOrFail($id);
     }
 
     public function paginate(int $perPage = 15)
@@ -59,7 +57,7 @@ class Item implements ItemServiceContract
 
     public function update($id, array $data) : ItemModel
     {
-        $item = $this->find($id);
+        $item = $this->findOrFail($id);
         $item->fill($data)
             ->save();
 
@@ -68,7 +66,7 @@ class Item implements ItemServiceContract
 
     public function destroy($id) : bool
     {
-        $item = $this->find($id);
+        $item = $this->findOrFail($id);
 
         return $item->delete();
     }

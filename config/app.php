@@ -178,6 +178,8 @@ return [
         App\Providers\RouteServiceProvider::class,
         App\Providers\ServicesServiceProvider::class,
 
+        PrettyRoutes\ServiceProvider::class,
+
     ],
 
     /*

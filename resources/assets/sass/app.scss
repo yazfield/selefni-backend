@@ -1,9 +1,28 @@
-
-// Fonts
-@import url(https://fonts.googleapis.com/css?family=Raleway:300,400,600);
-
 // Variables
 @import "variables";
+@import url("//fonts.googleapis.com/css?family=Roboto:300,400,500,700,400italic");
+@import url("//fonts.googleapis.com/icon?family=Material+Icons");
+@import "node_modules/vue-material/dist/vue-material";
 
-// Bootstrap
-@import "node_modules/bootstrap-sass/assets/stylesheets/bootstrap";
+// Header.vue
+.header {
+    h1 {
+        margin-left: 10px; 
+        margin-right: 2.5%;
+    }
+    .search .md-input-container {
+        button .md-icon:not(.md-icon-delete):after {
+            height: 0;
+        }
+        label {
+            left: 7.5%;
+        }
+    }
+}
+.main-navigation {
+    a.md-button {
+        margin: 0;
+    }
+}
+
+//end Header.vue
