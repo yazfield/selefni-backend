@@ -10,7 +10,7 @@
 | contains the "web" middleware group. Now create something great!
 |
 */
-//Route::get('/{section}', 'HomeController@index')->where(['section' => '.*']);;
+Route::get('/{section}', 'HomeController@index')->where([ 'section' => '.*' ]);;
 Route::get('/', 'HomeController@index');
 // Route::resource('/users', 'UsersController', [
 //     'middleware' => 'auth:api'
@@ -21,4 +21,3 @@ Route::get('/', 'HomeController@index');
 
 //Auth::routes();
 
-Route::post('login', 'Auth\LoginController@login');

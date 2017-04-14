@@ -22,4 +22,10 @@ Route::group(['prefix' => '/users',], function ()
  //->middleware('auth:api');
 Route::any('/users/{id}/activate/{code}', 'UsersController@activate')->name('activate_user');
 
-Route::resource('/items', 'ItemsController'); //->middleware('auth:api');
+Route::get('/profile', 'UsersController@profile')->middleware('auth:api');
+
+Route::post('/logout', 'UsersController@logout')->middleware('auth:api');
+
+//Route::resource('/items', 'ItemsController');//->middleware('auth:api');
+Route::put('/items/{id}', 'ItemsController@update');
+Route::get('/user_items', 'ItemsController@user')->middleware('auth:api');

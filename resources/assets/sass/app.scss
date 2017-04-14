@@ -3,11 +3,12 @@
 @import url("//fonts.googleapis.com/css?family=Roboto:300,400,500,700,400italic");
 @import url("//fonts.googleapis.com/icon?family=Material+Icons");
 @import "node_modules/vue-material/dist/vue-material";
+@import "/node_modules/animate.css/animate.css";
 
-// Header.vue
+// ToolBar.vue
 .header {
     h1 {
-        margin-left: 10px; 
+      margin-left: 10px;
         margin-right: 2.5%;
     }
     .search .md-input-container {
@@ -23,6 +24,74 @@
     a.md-button {
         margin: 0;
     }
+
+  button {
+    margin: 0;
+  }
 }
 
-//end Header.vue
+.user-card {
+  margin: 12px 10px;
+  > div {
+    margin: 0 10px;
+  }
+  .md-avatar {
+    width: 96px;
+    height: 96px;
+    margin: 0;
+  }
+}
+
+.user-card-links {
+  flex-flow: row wrap;
+  margin: 10px 0;
+  form {
+    display: inline;
+  }
+  li:first-child {
+    margin-right: 4px;
+  }
+  .md-button {
+    padding: 0 8px;
+  }
+}
+
+//end ToolBar.vue
+
+// Login.vue
+h1.logo {
+  width: 192px;
+}
+
+.clean-template {
+  form {
+    margin-bottom: 10%;
+  }
+}
+
+//end Login.vue
+
+// misc
+.list-inline {
+  list-style: none;
+  padding: 0;
+  li {
+    display: inline;
+    .md-button {
+      margin: 0;
+    }
+  }
+}
+
+// end misc
+
+body.md-theme-default {
+  background-color: $grey-100 !important;
+}
+
+.speed-animation {
+  -webkit-animation-duration: 0.5s; /* Safari 4+ */
+  -moz-animation-duration: 0.5s; /* Fx 5+ */
+  -o-animation-duration: 0.5s; /* Opera 12+ */
+  animation-duration: 0.5s;
+}

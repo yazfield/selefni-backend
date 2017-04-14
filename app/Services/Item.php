@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Item as ItemModel;
 use App\Services\Contracts\ItemService as ItemServiceContract;
 use App\Services\Contracts\UserService as UserServiceContract;
+use App\User as UserModel;
 
 /**
  * Item Service class.
@@ -33,9 +34,19 @@ class Item implements ItemServiceContract
         return $q->findOrFail($id);
     }
 
-    public function paginate(int $perPage = 15)
+    // TODO: put perPage in a config file
+    public function paginate(int $perPage = 6)
     {
         return $this->model->with('borrowedTo', 'borrowedFrom')->paginate($perPage);
+    }
+
+    public function paginateUserItems(UserModel $user, int $perPage = 6)
+    {
+        $id = $user->id;
+
+        return $this->model->where(function ($query) use ($id) {
+                $query->where('borrowed_to', $id)->orWhere('borrowed_from', $id);
+            })->with('borrowedTo', 'borrowedFrom')->paginate($perPage);
     }
 
     /**
@@ -57,7 +68,17 @@ class Item implements ItemServiceContract
 
     public function update($id, array $data) : ItemModel
     {
-        $item = $this->findOrFail($id);
+        $item = $this->model->findOrFail($id);
+
+        $userService = app(UserServiceContract::class);
+        if (isset($data[ 'new_user' ])) {
+            $userData = $data[ $data[ 'new_user' ].'_data' ];
+            $user = $userService->createUserWithoutAccount($userData);
+            $data[ $data[ 'new_user' ] ] = $user->id;
+        }
+
+        dd($data);
+
         $item->fill($data)
             ->save();
 
@@ -66,7 +87,7 @@ class Item implements ItemServiceContract
 
     public function destroy($id) : bool
     {
-        $item = $this->findOrFail($id);
+        $item = $this->model->findOrFail($id);
 
         return $item->delete();
     }

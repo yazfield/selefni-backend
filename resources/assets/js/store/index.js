@@ -1,13 +1,17 @@
-import Vue from 'vue';
-import Vuex from 'vuex';
-import {actions} from './actions';
-import {mutations} from './mutations';
-import {getters} from './getters';
-import auth from './modules/auth';
-import {templates} from '../constants';
-import {Token} from './modules/utils';
+import Vue from "vue";
+import Vuex from "vuex";
+import {actions} from "./actions";
+import {mutations} from "./mutations";
+import {getters} from "./getters";
+import auth from "./modules/auth";
+import items from "./modules/items";
+import {templates} from "../constants";
 
 Vue.use(Vuex);
+
+const persists = [
+    auth.persist
+];
 
 const debug = process.env.NODE_ENV !== 'production';
 
@@ -20,7 +24,9 @@ export default new Vuex.Store({
     mutations,
     getters,
     modules: {
-        auth
+        auth,
+        items
     },
-    strict: debug
+    strict: debug,
+    plugins: [...persists]
 });

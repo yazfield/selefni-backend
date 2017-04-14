@@ -37,3 +37,22 @@ $factory->define(App\Item::class, function (Faker\Generator $faker) {
         'borrowed_from' => 2,
     ];
 });
+
+$factory->defineAs(App\Item::class, 'book', function ($faker) use ($factory) {
+    $item = $factory->raw(App\Item::class);
+
+    return array_merge($item, [ 'type' => 'book' ]);
+});
+
+$factory->defineAs(App\Item::class, 'money', function ($faker) use ($factory) {
+    $item = $factory->raw(App\Item::class);
+
+    return array_merge($item, [ 'type' => 'money', 'amount' => rand(1, 10000) ]);
+});
+
+$factory->defineAs(App\Item::class, 'object', function ($faker) use ($factory) {
+    $item = $factory->raw(App\Item::class);
+
+    return array_merge($item, [ 'type' => 'object' ]);
+});
+

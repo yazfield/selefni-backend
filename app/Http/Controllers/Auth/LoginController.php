@@ -26,7 +26,7 @@ class LoginController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = '/home';
+    protected $redirectTo = '/';
 
     /**
      * Create a new controller instance.
@@ -55,7 +55,6 @@ class LoginController extends Controller
 
         //dd('attempt');
         if ($this->attemptLogin($request)) {
-            dd($this->sendLoginResponse($request));
             return $this->sendLoginResponse($request);
         }
 
@@ -65,11 +64,6 @@ class LoginController extends Controller
         $this->incrementLoginAttempts($request);
 
         return $this->sendFailedLoginResponse($request);
-    }
-
-    public function username()
-    {
-        return 'username';
     }
 
     /**
@@ -83,6 +77,11 @@ class LoginController extends Controller
         $credentials = $request->only('password');
         $credentials[username_field($username)] = $username;
         return $credentials;
+    }
+
+    public function username()
+    {
+        return 'username';
     }
 
     protected function authenticated(Request $request, $user)

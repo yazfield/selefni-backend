@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Services\Contracts\ItemService;
+use Illuminate\Http\Request;
 
 class ItemsController extends Controller
 {
@@ -38,6 +38,11 @@ class ItemsController extends Controller
         return $this->itemService->paginate();
     }
 
+    public function user(Request $request)
+    {
+        return $this->itemService->paginateUserItems($request->user(), $request->get('per_page', 6));
+    }
+
     /**
      * Show the form for creating a new resource.
      *
@@ -58,13 +63,15 @@ class ItemsController extends Controller
     {
         //TODO: borrowed exists..
         $validator = $this->validator->make($request->all(), [
-            'name' => 'required',
-            'details' => 'sometimes',
-            'amount' => 'sometimes|integer',
-            'type' => 'required',
-            'return_at' => 'required|date',
-            'borrowed_to' => 'required',
+            'name'          => 'required',
+            'details'       => 'sometimes',
+            'amount'        => 'sometimes|integer',
+            'type'          => 'required',
+            'return_at'     => 'required|date',
+            'borrowed_at'   => 'sometimes|date',
+            'borrowed_to'   => 'required',
             'borrowed_from' => 'required',
+            'image'         => 'sometimes|image',
         ]);
         if ($validator->fails()) {
             return response()->json(['message' => $validator->messages()], 400);
@@ -108,7 +115,24 @@ class ItemsController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $validator = $this->validator->make($request->all(), [
+            'name'          => 'sometimes',
+            'details'       => 'sometimes',
+            'amount'        => 'sometimes|integer',
+            'type'          => 'sometimes',
+            'return_at'     => 'sometimes|date',
+            'returned_at'   => 'sometimes|date',
+            'borrowed_at'   => 'sometimes|date',
+            'borrowed_to'   => 'sometimes',
+            'borrowed_from' => 'sometimes',
+        ]);
+        if ($validator->fails()) {
+            return response()->json([ 'message' => $validator->messages() ], 400);
+        }
+
+        $result = $this->itemService->update($id, $request->all());
+
+        return response()->json($result->toArray());
     }
 
     /**
@@ -121,4 +145,17 @@ class ItemsController extends Controller
     {
         //
     }
+}
+
+function parseContent($content)
+{
+    $lines = explode("\r\n", $content);
+    $result = [];
+    $contentType = explode('; ', $lines[ 0 ]);
+    $result[ 'content-type' ] = explode(': ', array_pop($contentType))[ 1 ];
+    foreach ($contentType as $item) {
+        list($paramName, $paramValue) = explode('=', $item);
+        $result[ $paramName ] = trim($paramValue, '"');
+    }
+
 }

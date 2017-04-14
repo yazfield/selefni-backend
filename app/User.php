@@ -2,13 +2,13 @@
 
 namespace App;
 
-use Config;
 use Carbon\Carbon;
-use Laravel\Passport\HasApiTokens;
+use Config;
 use Illuminate\Contracts\Hashing\Hasher;
-use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Laravel\Passport\HasApiTokens;
 
 /**
  * User model class.
@@ -30,7 +30,10 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = ['name', 'email', 'password', 'phone_number', 'active',
-        'activation_code', 'activation_code_created_at', ];
+        'activation_code',
+        'activation_code_created_at',
+        'avatar'
+    ];
 
     /**
      * The attributes that should be hidden for arrays.

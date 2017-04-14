@@ -8,12 +8,12 @@
 
 namespace App\Services;
 
-use App\User as UserModel;
 use App\Events\UserEvents\UserSubscribedEvent;
-use App\Exceptions\EmailAlreadyExistsException;
 use App\Exceptions\ActivationCodeExpiredException;
+use App\Exceptions\EmailAlreadyExistsException;
 use App\Exceptions\PhoneNumberAlreadyExistsException;
 use App\Services\Contracts\UserService as UserServiceContract;
+use App\User as UserModel;
 
 /**
  * User Service class.
@@ -42,6 +42,7 @@ class User implements UserServiceContract
         // TODO: many phone numbers
         $fields = ['email', 'phone_number'];
         // check if user already exists
+        $user = null;
         foreach ($fields as $field) {
             try {
                 $user = $this->findBy($field, $data[$field], true);
@@ -70,17 +71,6 @@ class User implements UserServiceContract
         return $user;
     }
 
-    private function createUser(array $data) : UserModel
-    {
-        // subscribe new user
-        $user = new $this->model($data);
-        $user
-            ->requestActivation()
-            ->save();
-
-        return $user;
-    }
-
     private function restoreUser(UserModel $user, array $data) : UserModel
     {
         // user had deleted his account
@@ -92,9 +82,13 @@ class User implements UserServiceContract
         return $user;
     }
 
-    public function find($id, bool $includeTrashed = false) : UserModel
+    private function createUser(array $data): UserModel
     {
-        return $this->findBy(username_field($id), $id, $includeTrashed);
+        // subscribe new user
+        $user = new $this->model($data);
+        $user->requestActivation()->save();
+
+        return $user;
     }
 
     public function activate($id, int $code) : UserModel
@@ -106,6 +100,11 @@ class User implements UserServiceContract
         $result->save();
 
         return $result;
+    }
+
+    public function find($id, bool $includeTrashed = false): UserModel
+    {
+        return $this->findBy(username_field($id), $id, $includeTrashed);
     }
 
     public function deactivate($id) : UserModel

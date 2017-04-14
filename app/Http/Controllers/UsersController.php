@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Http\JsonResponse;
-use App\Services\Contracts\UserService;
-use App\Exceptions\EmailAlreadyExistsException;
 use App\Exceptions\ActivationCodeExpiredException;
+use App\Exceptions\EmailAlreadyExistsException;
 use App\Exceptions\PhoneNumberAlreadyExistsException;
+use App\Services\Contracts\UserService;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 /**
  * Class UsersController.
@@ -41,23 +41,28 @@ class UsersController extends Controller
     public function store(Request $request) : JsonResponse
     {
         $validator = $this->validator->make($request->all(), [
-            'email' => 'required|email',
-            'password' => 'required|min:8',
-            'name' => 'required|regex:/^[\pL\s\-]+$/u|min:3',
+            'email'        => 'required|email',
+            'password'     => 'required|min:8',
+            'name'         => 'required|regex:/^[\pL\s\-]+$/u|min:3',
             'phone_number' => "sometimes|regex:/^\(?\+?([0-9]{1,4})\)?[-\. ]?(\d{3})[-\. ]?([0-9]{7})$/u",
+            'avatar'       => 'sometimes|image',
         ]);
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->messages()], 400);
         }
+        $data = $request->all();
+        $data[ 'avatar' ] = $request->file('avatar')->store('avatars');
         try {
-            $user = $this->userService->store($request->all());
+            $user = $this->userService->store($data);
         } catch (EmailAlreadyExistsException $e) {
+            \Storage::delete($data[ 'avatar' ]);
             $errors = [
                 'email' => 'The email elready exists',
             ];
 
             return response()->json(['errors' => $errors], 400);
         } catch (PhoneNumberAlreadyExistsException $e) {
+            \Storage::delete($data[ 'avatar' ]);
             $errors = [
                 'phone_number' => 'The phone number elready exists',
             ];
@@ -76,6 +81,22 @@ class UsersController extends Controller
         $user = $this->userService->find($id);
 
         return response()->json($user->toArray());
+    }
+
+    public function profile(Request $request): JsonResponse
+    {
+        $user = $request->user();
+
+        return response()->json($user->toArray());
+    }
+
+    public function logout(Request $request)
+    {
+        $request->user()->token()->revoke();
+
+        return response()->json([
+            'message' => 'Use logged out'
+        ]);
     }
 
     /**

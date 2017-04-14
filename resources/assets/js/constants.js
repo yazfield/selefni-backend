@@ -3,4 +3,4 @@ export const templates = {
     clean: 'clean',
     dashboard: 'dashboard',
     default: 'dashboard'
-}
+};

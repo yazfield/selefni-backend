@@ -1,33 +1,58 @@
-import * as types from '../mutation-types';
-import auth from '../../api/auth';
-import {router} from '../../router';
-import {Token} from './utils';
+import * as types from "../mutation-types";
+import {auth} from "../../api";
+import {Token, User} from "./utils";
+import createPersistedState from "vuex-persistedstate";
 
 const state = {
-    auth: { 
-        pending: false,
-        user: null,
-        token: localStorage.getItem('token') ? new Token(localStorage.getItem('token')) : null,
-        error: null
-    },
-}
+    pending: false,
+    user: null,
+    token: null,
+    error: null,
+    notifications: []
+};
+
+const persist = createPersistedState({
+    key: 'auth',
+    paths: [
+        'auth.token',
+        'auth.user'
+    ],
+    getState: (key, storage) => {
+        let value = storage.getItem(key);
+        if (!value) {
+            return undefined;
+        }
+        value = JSON.parse(value);
+        if (key === 'auth') {
+            if (value.auth.token) {
+                value.auth.token = new Token(value.auth.token);
+            }
+            if (value.auth.user) {
+                value.auth.user = new User(value.auth.user);
+            }
+        }
+        return value;
+
+    }
+});
 
 const getters = {
-    isLoggedIn: state => state.auth.token && state.auth.token.isValid(),
-    isLoggingIn: state => state.auth.pending,
-    user: state => state.auth.user,
-    getToken: state => state.auth.token,
-    authError: state => state.auth.error
-}
+    isLoggedIn: state => !!state.token,
+    isLoggingIn: state => state.pending,
+    user: state => state.user,
+    getToken: state => state.token,
+    authError: state => state.error,
+    notifications: state => state.notifications
+};
 
 const actions = {
-    login({commit, state}, credentials) {
+    login({dispatch, commit}, credentials) {
         commit(types.LOGIN_REQUEST);
         return new Promise((resolve, reject) => {
             auth.login(credentials)
-            .then(token => {
-                commit(types.LOGIN_SUCCESS, token);
-                localStorage.setItem('token', JSON.stringify(token));
+                .then(rawToken => {
+                    commit(types.LOGIN_SUCCESS, rawToken);
+                    dispatch('getProfile');
                 resolve();
             }).catch(error => {
                 commit(types.LOGIN_FAILURE, error);
@@ -35,82 +60,126 @@ const actions = {
             });
         });
     },
-    refreshToken({commit, state}, token) {
-        commit(types.REFRESH_TOKEN_REQUEST);
-        return new Promise(function(resolve, reject){
-            auth.refreshToken(state.auth.token.refreshToken)
-            .then(token => {
-                commit(types.REFRESH_TOKEN_SUCCESS, token);
-                resolve();
-            }).catch(error => {
-                commit(types.REFRESH_TOKEN_FAILURE, error);
-                localStorage.removeItem('token');
+    logout({commit}) {
+        commit(types.LOGOUT_REQUEST);
+        return new Promise((resolve, reject) => {
+            auth.logout()
+                .then(() => {
+                    commit(types.LOGOUT_SUCCESS);
+                    resolve();
+                }).catch(error => {
+                commit(types.LOGOUT_FAILURE, error);
                 reject(error);
             });
         });
-    }, 
-    loadToken({commit, state}, token) {
-        token = token || localStorage.getItem('token');
-        if(token) {
-            commit(types.SET_TOKEN, token);
+    },
+    refreshToken({commit, state}) {
+        commit(types.REFRESH_TOKEN_REQUEST);
+        return new Promise(function(resolve, reject){
+            auth.refreshToken(state.token.refreshToken)
+                .then(rawToken => {
+                    commit(types.REFRESH_TOKEN_SUCCESS, rawToken);
+                resolve();
+            }).catch(error => {
+                commit(types.REFRESH_TOKEN_FAILURE, error);
+                reject(error);
+            });
+        });
+    },
+    loadToken({commit}, rawToken) {
+        if (rawToken) {
+            commit(types.SET_TOKEN, rawToken);
         }
     },
-    getProfile({commit, state}) {
+    getProfile({dispatch, commit}) {
         commit(types.USER_PROFILE_REQUEST);
         return new Promise(function(resolve, reject){
-            auth.getProfile(state.auth.token)
+            auth.getProfile()
             .then(user => {
                 commit(types.USER_PROFILE_SUCCESS, user);
-                resolve(user);
+                resolve();
             }).catch(error => {
+                if (error.response.code === 401) {
+                    dispatch('refreshToken').then(function () {
+                        dispatch('getProfile');
+                    }).catch(function () {
+                        commit(types.USER_PROFILE_FAILURE, error);
+                        reject(error);
+                    });
+                    return;
+                }
                 commit(types.USER_PROFILE_FAILURE, error);
                 reject(error);
             });
         });
     }
-}
+};
 
 const mutations = {
     [types.LOGIN_REQUEST] (state) {
-        state.auth.pending = true;
-        state.auth.error = null;
+        state.pending = true;
+        state.error = null;
     },
     [types.LOGIN_SUCCESS] (state, rawToken) {
-        state.auth.pending = false;
-        state.auth.error = null;
-        state.auth.token = new Token(rawToken);
+        state.pending = false;
+        state.error = null;
+        state.token = new Token(rawToken);
     },
     [types.LOGIN_FAILURE] (state, error) {
-        state.auth.pending = false;
-        state.auth.error = error;
+        state.pending = false;
+        state.error = error;
+    },
+    [types.LOGOUT_REQUEST] (state) {
+        state.error = null;
+        state.pending = true;
+    },
+    [types.LOGOUT_SUCCESS] (state) {
+        state.pending = false;
+        state.token = null;
+        state.user = null;
+        state.error = null;
+    },
+    [types.LOGOUT_FAILURE] (state, error) {
+        state.pending = false;
+        state.error = error;
     },
     [types.REFRESH_TOKEN_REQUEST] (state) {
-        state.auth.pending = true;
-        state.auth.error = null;
+        //state.auth.pending = true;
+        state.error = null;
     },
     [types.REFRESH_TOKEN_SUCCESS] (state, rawToken) {
-        state.auth.pending = false;
-        state.auth.error = null;
-        state.auth.token = new Token(rawToken);
+        //state.auth.pending = false;
+        state.error = null;
+        state.token = new Token(rawToken);
     },
     [types.REFRESH_TOKEN_FAILURE] (state, error) {
-        state.auth.pending = false;
-        state.auth.error = error;
-        state.auth.token = null;
+        //state.auth.pending = false;
+        state.error = error;
+        state.token = null;
     },
     [types.SET_TOKEN] (state, rawToken) {
-        state.auth.pending = false;
-        state.auth.error = null;
-        state.auth.token = new Token(rawToken);
+        state.pending = false;
+        state.error = null;
+        state.token = new Token(rawToken);
+    },
+    [types.USER_PROFILE_REQUEST] (state) {
+        //state.pending = true;
     },
     [types.USER_PROFILE_SUCCESS] (state, user) {
-        state.auth.user = user;
+        //state.pending = false;
+        state.user = new User(user);
     },
-}
+    [types.USER_PROFILE_FAILURE] (state, error) {
+        //state.pending = false;
+        state.user = null;
+        state.error = error;
+    },
+};
 
 export default {
     state,
     getters,
     actions,
-    mutations
+    mutations,
+    persist
 }

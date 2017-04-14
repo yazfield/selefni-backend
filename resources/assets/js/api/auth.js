@@ -1,6 +1,6 @@
-import Vue from 'vue';
-import * as constants from './constants';
-import {oauthParameters} from './config';
+import Vue from "vue";
+import * as constants from "./constants";
+import {oauthParameters} from "./config";
 
 export default {
     register(data) {
@@ -18,19 +18,20 @@ export default {
         let data = {
             ...oauthParameters,
             ...credentials
-        }
+        };
         return Vue.$http.post(
             constants.LOGIN_ROUTE,
             data,
         ).then(response => Promise.resolve(response.data));
-        /*.then(response => {
-            context.errors = {};
-            localStorage.setItem('token', response.data);
-            context.error = false;
-            localStorage.setItem('id_token', response.data.meta.token);
-            context.$http.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('id_token');
-            context.user.authenticated = true;
-            context.user.profile = response.data.data;
-        })*/
+    },
+    logout() {
+        return Vue.$http.post(
+            constants.LOGOUT,
+        ).then(response => Promise.resolve(response.data));
+    },
+    getProfile() {
+        return Vue.$http.get(
+            constants.PROFILE,
+        ).then(response => Promise.resolve(response.data));
     }
 }
