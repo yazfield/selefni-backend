@@ -9,13 +9,19 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\HasApiTokens;
+use Spatie\MediaLibrary\HasMedia\HasMediaTrait;
+use Spatie\MediaLibrary\HasMedia\Interfaces\HasMedia;
 
 /**
  * User model class.
  */
-class User extends Authenticatable
+class User extends Authenticatable implements HasMedia
 {
-    use Notifiable, SoftDeletes, HasApiTokens;
+    use Notifiable, SoftDeletes, HasApiTokens, HasMediaTrait;
+    use SingleMediaTrait {
+        setSingleMedia as setAvatar;
+        getSingleMediaUrl as getAvatarUrl;
+    }
 
     /**
      * Hasher class for password hashing.
@@ -32,7 +38,6 @@ class User extends Authenticatable
     protected $fillable = ['name', 'email', 'password', 'phone_number', 'active',
         'activation_code',
         'activation_code_created_at',
-        'avatar'
     ];
 
     /**
@@ -58,6 +63,12 @@ class User extends Authenticatable
     protected $casts = ['active' => 'boolean'];
 
     /**
+     * The accessors to append to the model's array form.
+     * @var array
+     */
+    protected $appends = [ 'avatar' ];
+
+    /**
      * User constructor.
      *
      * @param array  $attributes
@@ -67,6 +78,17 @@ class User extends Authenticatable
     {
         $this->_hasher = app(Hasher::class);
         parent::__construct($attributes);
+    }
+
+    public function getAvatarAttribute()
+    {
+        return $this->getAvatarUrl();
+    }
+
+    public function getDefaultMediaUrl(): string
+    {
+        // FIXME: probably add female / male avatars
+        return config('selefni.user.avatar.default');
     }
 
     /**

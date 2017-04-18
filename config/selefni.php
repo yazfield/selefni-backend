@@ -13,4 +13,19 @@ return [
     'activation_code' => [
         'lifetime' => 24,
     ],
+
+    // items
+    'item'            => [
+        'images' => [
+            'object'  => '/images/object.jpg',
+            'book'    => '/images/book.jpg',
+            'money'   => '/images/money.jpg',
+            'default' => '/images/object.jpg',
+        ],
+    ],
+    'user'            => [
+        'avatar' => [
+            'default' => '/images/avatar.jpg',
+        ],
+    ],
 ];

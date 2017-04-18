@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use \Illuminate\Database\Eloquent\Model;
+
 trait InjectModel
 {
     /**
@@ -10,17 +12,17 @@ trait InjectModel
     private $model;
 
     /**
-     * @return Model
+     *
      */
-    public function getModel()
+    public function getModel() : Model
     {
         return $this->model;
     }
 
     /**
-     * @param Model $model
+     *
      */
-    public function setModel($model)
+    public function setModel(Model $model)
     {
         $this->model = $model;
     }

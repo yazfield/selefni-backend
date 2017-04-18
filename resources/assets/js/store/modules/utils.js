@@ -82,16 +82,15 @@ export function extractItemData(item) {
         throw new Error('Item must not be null');
     }
 
-    let data = new FormData();
-    data.append('image', item.image, item.image.name);
-    data.append('borrowed_to', item.borrowed_to.id);
-    data.append('borrowed_from', item.borrowed_from.id);
-    const keys = ['name', 'type', 'details', 'returned_at', 'to_return_at',
+    let data = {};
+    data['borrowed_to'] = item.borrowed_to.id;
+    data['borrowed_from'] = item.borrowed_from.id;
+    const keys = ['name', 'type', 'details', 'returned_at', 'return_at',
         'amount', 'borrowed_at',];
 
     for (let [k, v] of Object.entries(item)) {
         if (includes(keys, k)) {
-            data.append(k, v);
+            data[k] = v;
         }
     }
     return data;

@@ -3,8 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Exceptions\ActivationCodeExpiredException;
-use App\Exceptions\EmailAlreadyExistsException;
-use App\Exceptions\PhoneNumberAlreadyExistsException;
 use App\Services\Contracts\UserService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -20,17 +18,11 @@ class UsersController extends Controller
     public $userService;
 
     /**
-     * @var Validator
-     */
-    public $validator;
-
-    /**
      * UsersController constructor.
      */
     public function __construct(UserService $userService)
     {
         $this->userService = $userService;
-        $this->validator = app('validator');
     }
 
     /**
@@ -40,35 +32,16 @@ class UsersController extends Controller
      */
     public function store(Request $request) : JsonResponse
     {
-        $validator = $this->validator->make($request->all(), [
+        $this->validate($request, [
             'email'        => 'required|email',
             'password'     => 'required|min:8',
             'name'         => 'required|regex:/^[\pL\s\-]+$/u|min:3',
             'phone_number' => "sometimes|regex:/^\(?\+?([0-9]{1,4})\)?[-\. ]?(\d{3})[-\. ]?([0-9]{7})$/u",
             'avatar'       => 'sometimes|image',
         ]);
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->messages()], 400);
-        }
+
         $data = $request->all();
-        $data[ 'avatar' ] = $request->file('avatar')->store('avatars');
-        try {
-            $user = $this->userService->store($data);
-        } catch (EmailAlreadyExistsException $e) {
-            \Storage::delete($data[ 'avatar' ]);
-            $errors = [
-                'email' => 'The email elready exists',
-            ];
-
-            return response()->json(['errors' => $errors], 400);
-        } catch (PhoneNumberAlreadyExistsException $e) {
-            \Storage::delete($data[ 'avatar' ]);
-            $errors = [
-                'phone_number' => 'The phone number elready exists',
-            ];
-
-            return response()->json(['errors' => $errors], 400);
-        }
+        $user = $this->userService->store($data);
 
         return response()->json($user->toArray());
     }
@@ -79,6 +52,17 @@ class UsersController extends Controller
     public function show($id) : JsonResponse
     {
         $user = $this->userService->find($id);
+
+        return response()->json($user->toArray());
+    }
+
+    public function setAvatar($id, Request $request): JsonResponse
+    {
+        $this->validate($request, [
+            'avatar' => 'required|image',
+        ]);
+
+        $user = $this->userService->setAvatar($id, $request->file('avatar'));
 
         return response()->json($user->toArray());
     }
@@ -107,15 +91,12 @@ class UsersController extends Controller
     public function update(Request $request, $id) : JsonResponse
     {
         $user = $this->userService->find($id);
-        $validator = $this->validator->make($request->all(), [
+        $this->validate($request, [
             'email' => "sometimes|email|unique:users,id,{$user->id}",
             'password' => 'sometimes|min:8',
             'name' => 'sometimes|regex:/^[\pL\s\-]+$/u|min:3',
             'phone_number' => "sometimes|unique:users,id,{$user->id}|regex:/^\(?\+?([0-9]{1,4})\)?[-\. ]?(\d{3})[-\. ]?([0-9]{7})$/u",
         ]);
-        if ($validator->fails()) {
-            return response()->json(['message' => $validator->messages()], 400);
-        }
 
         $user = $this->userService->update($user, $request->all());
 

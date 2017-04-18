@@ -10,8 +10,8 @@ class ItemsTableSeeder extends Seeder
      */
     public function run()
     {
-        factory(App\Item::class, 2)->create();
-        factory(App\Item::class, 'money', 2)->create();
-        factory(App\Item::class, 'book', 2)->create([ 'borrowed_to' => 2, 'borrowed_from' => 1 ]);
+        factory(App\Item::class, 2)->create([ 'borrowed_to' => 2, 'borrowed_from' => 3 ]);
+        factory(App\Item::class, 'money', 2)->create([ 'borrowed_to' => 2, 'borrowed_from' => 3 ]);
+        factory(App\Item::class, 'book', 2)->create([ 'borrowed_to' => 3, 'borrowed_from' => 2 ]);
     }
 }

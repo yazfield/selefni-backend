@@ -16,6 +16,8 @@ Route::group(['prefix' => '/users',], function ()
 {
     Route::get('/{id}', 'UsersController@show')->middleware('auth:api');
     Route::post('/', 'UsersController@store');
+    Route::post('/{id}/avatar', 'UsersController@setAvatar')
+         ->middleware('auth:api');
     Route::put('/{id}', 'UsersController@update')->middleware('auth:api');
     Route::delete('/{id}', 'UsersController@destroy')->middleware('auth:api');
 });
@@ -28,4 +30,5 @@ Route::post('/logout', 'UsersController@logout')->middleware('auth:api');
 
 //Route::resource('/items', 'ItemsController');//->middleware('auth:api');
 Route::put('/items/{id}', 'ItemsController@update');
+Route::post('/items/{id}/media', 'ItemsController@setImage');
 Route::get('/user_items', 'ItemsController@user')->middleware('auth:api');

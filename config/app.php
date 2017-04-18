@@ -179,6 +179,7 @@ return [
         App\Providers\ServicesServiceProvider::class,
 
         PrettyRoutes\ServiceProvider::class,
+        Spatie\MediaLibrary\MediaLibraryServiceProvider::class,
 
     ],
 

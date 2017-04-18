@@ -3,35 +3,39 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Spatie\MediaLibrary\HasMedia\HasMediaTrait;
+use Spatie\MediaLibrary\HasMedia\Interfaces\HasMedia;
 
-class Item extends Model
+class Item extends Model implements HasMedia
 {
+    use HasMediaTrait;
+    use SingleMediaTrait {
+        setSingleMedia as setImage;
+        getSingleMediaUrl as getImageUrl;
+    }
+
     protected $fillable = ['name', 'details', 'amount', 'type', 'return_at',
         'borrowed_to',
         'borrowed_from',
-        'image',
         'returned_at',
         'borrowed_at',
     ];
     protected $hidden = ['deleted_at'];
 
-    protected $dates = [
-        'returned_at',
-        'borrowed_at',
-        'return_at',
-    ];
+    protected $dates = [ 'returned_at', 'borrowed_at', 'return_at', ];
 
-    public function setTypeAttribute($value)
+    protected $appends = [ 'image' ];
+
+    public function getDefaultMediaUrl(): string
     {
-        $this->attributes[ 'type' ] = $value;
-        if ( ! isset($this->attributes[ 'image' ])) {
-            $this->setImageAttribute();
-        }
+        return config('selefni.item.images.'.$this->type, function () {
+            return config('selefni.item.images.default');
+        });
     }
 
-    public function setImageAttribute($value = null)
+    public function getImageAttribute()
     {
-        $this->attributes[ 'image' ] = $value ? $value : 'images/'.$this->attributes[ 'type' ].'.jpg';
+        return $this->getImageUrl();
     }
 
     public function borrowedFrom()
@@ -43,4 +47,23 @@ class Item extends Model
     {
         return $this->belongsTo('App\User', 'borrowed_to');
     }
+
+    public function scopeOfUser($query, int $id)
+    {
+        return $query->where(function ($query) use ($id) {
+            $query->where('borrowed_to', $id)
+                  ->orWhere('borrowed_from', $id);
+        });
+    }
+
+    public function scopeReturned($query)
+    {
+        return $query->whereNotNull('returned_at');
+    }
+
+    public function scopeNotReturned($query)
+    {
+        return $query->whereNull('returned_at');
+    }
+
 }

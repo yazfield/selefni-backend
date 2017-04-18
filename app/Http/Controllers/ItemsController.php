@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Services\Contracts\ItemService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class ItemsController extends Controller
@@ -13,11 +14,6 @@ class ItemsController extends Controller
     public $itemService;
 
     /**
-     * @var Validator
-     */
-    public $validator;
-
-    /**
      * ItemsController constructor.
      *
      * @param ItemService $itemService
@@ -25,7 +21,6 @@ class ItemsController extends Controller
     public function __construct(ItemService $itemService)
     {
         $this->itemService = $itemService;
-        $this->validator = app('validator');
     }
 
     /**
@@ -44,25 +39,14 @@ class ItemsController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $request): JsonResponse
     {
         //TODO: borrowed exists..
-        $validator = $this->validator->make($request->all(), [
+        $this->validate($request, [
             'name'          => 'required',
             'details'       => 'sometimes',
             'amount'        => 'sometimes|integer',
@@ -73,13 +57,21 @@ class ItemsController extends Controller
             'borrowed_from' => 'required',
             'image'         => 'sometimes|image',
         ]);
-        if ($validator->fails()) {
-            return response()->json(['message' => $validator->messages()], 400);
-        }
 
         $result = $this->itemService->store($request->all());
 
         return response()->json($result->toArray());
+    }
+
+    public function setImage($id, Request $request): JsonResponse
+    {
+        $this->validate($request, [
+            'image' => 'required|image',
+        ]);
+
+        $item = $this->itemService->setImage($id, $request->file('image'));
+
+        return response()->json(array_only($item->toArray(), [ 'id', 'image' ]));
     }
 
     /**
@@ -96,17 +88,6 @@ class ItemsController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -115,20 +96,18 @@ class ItemsController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $validator = $this->validator->make($request->all(), [
+        $this->validate($request, [
             'name'          => 'sometimes',
             'details'       => 'sometimes',
-            'amount'        => 'sometimes|integer',
+            'amount'        => 'nullable|sometimes|integer',
+            // FIXME: what are all types?
             'type'          => 'sometimes',
             'return_at'     => 'sometimes|date',
-            'returned_at'   => 'sometimes|date',
+            'returned_at'   => 'nullable|sometimes|date',
             'borrowed_at'   => 'sometimes|date',
             'borrowed_to'   => 'sometimes',
             'borrowed_from' => 'sometimes',
         ]);
-        if ($validator->fails()) {
-            return response()->json([ 'message' => $validator->messages() ], 400);
-        }
 
         $result = $this->itemService->update($id, $request->all());
 
@@ -145,17 +124,4 @@ class ItemsController extends Controller
     {
         //
     }
-}
-
-function parseContent($content)
-{
-    $lines = explode("\r\n", $content);
-    $result = [];
-    $contentType = explode('; ', $lines[ 0 ]);
-    $result[ 'content-type' ] = explode(': ', array_pop($contentType))[ 1 ];
-    foreach ($contentType as $item) {
-        list($paramName, $paramValue) = explode('=', $item);
-        $result[ $paramName ] = trim($paramValue, '"');
-    }
-
 }

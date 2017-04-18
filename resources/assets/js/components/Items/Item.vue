@@ -9,7 +9,7 @@
             return {
                 update: false,
                 pending: false,
-                dirtyItem: null,
+                dirtyItem: {},
                 createdAtOptions: {
                     allowInput: true,
                     enableTime: false,
@@ -91,16 +91,23 @@
             },
             commitUpdate() {
                 this.pending = true;
-                let putItem = Object.assign({}, this.dirtyItem);
-                if (putItem.image.charAt(putItem.image.length - 1) === '=') {
-                    putItem.image = this.imageUpload.file;
-                }
-                this.$store.dispatch('updateItem', putItem)
+                // FIXME: don't update if not dirty
+                this.$store.dispatch('updateItem', this.dirtyItem)
                     .then(() => {
+                        if (this.imageUpload.file) {
+                            const payload = {id: this.id, image: this.imageUpload.file};
+                            return this.$store.dispatch('uploadItemImage', payload);
+                        }
+                    })
+                    .then(() => {
+                        this.update = false;
                         this.pending = false;
                     })
                     .catch(() => {
                         this.pending = false;
+                        this.dirtyItem = Object.assign({}, this.item);
+                        // TODO: show toast
+                        this.update = false;
                     });
             },
             updateOrCommit() {
@@ -120,7 +127,6 @@
             },
             createImage(file){
                 this.imageUpload.file = file;
-                let image = new Image();
                 let reader = new FileReader();
                 this.imageUpload.name = file.name;
                 let me = this;
@@ -166,11 +172,11 @@
                 </transition>
                 <transition enter-active-class="animate speed-animation fadeIn"
                             leave-active-class="animate speed-animation fadeOut">
-                    <img v-if="!update" :src="item.image" :alt="item.name"/>
+                    <img v-show="!update" :src="item.image" :alt="item.name"/>
                 </transition>
                 <transition enter-active-class="animate speed-animation fadeIn"
                             leave-active-class="animate speed-animation fadeOut">
-                    <img v-if="update" :src="dirtyItem.image" :alt="dirtyItem.name"/>
+                    <img v-show="update" :src="dirtyItem.image" :alt="dirtyItem.name"/>
                 </transition>
                 <my-upload v-if="update" field="img" url="apiConstants.UPLOAD_ITEM_IMAGE"
                            :width="300" :height="300" :params="imageUpload.params"
@@ -357,7 +363,7 @@
 
     </md-dialog>
 </template>
-<style lang="scss">
+<style lang="scss" rel="stylesheet/scss">
     @import '../../VueFlatPickr/theme/material_blue.css';
     @import '../../../sass/_variables.scss';
     @import 'node_modules/sass-material-colors/sass/sass-material-colors';
@@ -373,10 +379,9 @@
         background: transparent;
         color: white;
         font-size: 14px;
-        font-family: $ font-roboto;
+        font-family: $font-roboto;
 
-    &
-    :focus {
+    &:focus {
         outline: none;
     }
 
@@ -387,11 +392,10 @@
     }
 
     .md-theme-default.md-button:not([disabled]).md-fab.orange {
-        background-color: $ orange-a200;
+        background-color: material-color('orange', 'a200');
 
-    &
-    :hover {
-        background-color: $ orange-600;
+    &:hover {
+        background-color: material-color('orange', '600');
     }
 
     }
@@ -400,15 +404,14 @@
 
     .md-theme-default.md-card.md-primary .md-card-content .md-input-container {
 
-    &
-    :after {
+    &:after {
         height: 1px;
         position: absolute;
         right: 0;
         bottom: 0;
         left: 0;
         background-color: material-color('grey', '400');
-        transition: $ swift-ease-out;
+        transition: $swift-ease-out;
         content: " ";
     }
 
@@ -428,23 +431,22 @@
         -webkit-text-fill-color: material-color('grey', '600');
     }
 
-    &
-    :after {
+    &:after {
         height: 2px;
         position: absolute;
         right: 0;
         bottom: 0;
         left: 0;
         background-color: material-color('grey', '400');
-        transition: $ swift-ease-out;
+        transition: $swift-ease-out;
         content: " ";
     }
 
     }
 
     .md-select {
-    / / max-width: 250 px;
-    / / border-bottom: 2 px solid material-color('grey', '400');
+        /* max-width: 250 px;
+         border-bottom: 2 px solid material-color('grey', '400'); */
     }
 
     .md-dialog {
@@ -467,11 +469,16 @@
         text-align: center;
 
     img {
-        max-height: 200px;
+        /*max-height: 200px;*/
     }
 
-    &
-    :has(.md-ink-ripple) {
+    .md-title {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    &:has(.md-ink-ripple) {
         cursor: pointer;
         cursor: hand;
     }
@@ -489,7 +496,7 @@
     .md-card-header + .md-card-content {
         background: white;
         color: black;
-    / / padding-top: 16 px;
+        /* padding-top: 16 px; */
     }
 
     .md-fab.md-fab-bottom-right {
@@ -529,7 +536,7 @@
         overflow: auto;
 
     .md-input-container {
-    / / padding-top: 0;
+        /* padding-top: 0; */
         margin-bottom: 15px;
     }
 

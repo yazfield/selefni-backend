@@ -14,6 +14,7 @@ use App\Exceptions\EmailAlreadyExistsException;
 use App\Exceptions\PhoneNumberAlreadyExistsException;
 use App\Services\Contracts\UserService as UserServiceContract;
 use App\User as UserModel;
+use Illuminate\Http\UploadedFile;
 
 /**
  * User Service class.
@@ -88,7 +89,24 @@ class User implements UserServiceContract
         $user = new $this->model($data);
         $user->requestActivation()->save();
 
+        if (array_has($data, 'avatar')) {
+            $user->setAvatar($data[ 'avatar' ]);
+        }
+
         return $user;
+    }
+
+    public function setAvatar($id, UploadedFile $avatar): UserModel
+    {
+        $user = $this->find($id);
+        $user->setAvatar($avatar);
+
+        return $user;
+    }
+
+    public function find($id, bool $includeTrashed = false): UserModel
+    {
+        return $this->findBy(username_field($id), $id, $includeTrashed);
     }
 
     public function activate($id, int $code) : UserModel
@@ -100,11 +118,6 @@ class User implements UserServiceContract
         $result->save();
 
         return $result;
-    }
-
-    public function find($id, bool $includeTrashed = false): UserModel
-    {
-        return $this->findBy(username_field($id), $id, $includeTrashed);
     }
 
     public function deactivate($id) : UserModel

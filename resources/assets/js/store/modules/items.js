@@ -51,15 +51,25 @@ const actions = {
         const itemId = dirtyItem.id;
         let preparedItem = extractItemData(dirtyItem);
         return new Promise((resolve, reject) => {
-            var i = items.updateItem(itemId, preparedItem).then((data) => {
-                //console.log('update item data', data);
+            items.updateItem(itemId, preparedItem).then((data) => {
                 commit(types.UPDATE_ITEM_SUCCESS, data);
                 resolve();
             }).catch((error) => {
                 commit(types.UPDATE_ITEM_FAILURE, error);
                 reject(error);
             });
-            //console.log('i', i);
+        });
+    },
+    uploadItemImage: function ({commit}, {id, image}) {
+        commit(types.UPLOAD_ITEM_IMAGE_REQUEST);
+        return new Promise((resolve, reject) => {
+            items.uploadImage(id, image).then((data) => {
+                commit(types.UPLOAD_ITEM_IMAGE_SUCCESS, data);
+                resolve();
+            }).catch((error) => {
+                commit(types.UPLOAD_ITEM_IMAGE_FAILURE, error);
+                reject(error);
+            });
         });
     }
 };
@@ -114,6 +124,19 @@ const mutations = {
         state.items.data.push(data);
     },
     [types.UPDATE_ITEM_FAILURE](state, error) {
+        //state.pending = false;
+    },
+    [types.UPLOAD_ITEM_IMAGE_REQUEST](state) {
+        //state.pending = true;
+    },
+    [types.UPLOAD_ITEM_IMAGE_SUCCESS](state, data) {
+        const idx = state.items.data.findIndex(item => item.id === data.id);
+        let item = Object.assign({}, state.items.data[idx]);
+        item.image = data.image;
+        state.items.data.splice(idx, 1);
+        state.items.data.push(item);
+    },
+    [types.UPLOAD_ITEM_IMAGE_FAILURE](state, error) {
         //state.pending = false;
     },
 };

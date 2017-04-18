@@ -71,11 +71,11 @@
     }
 
     .notifications-header {
-    / / padding: 1.5 %;
+        /*padding: 1.5 %;*/
 
-    .md-display-1 {
-        font-size: 20px;
-    }
+        .md-display-1 {
+            font-size: 20px;
+        }
 
     }
     .notifications-content .md-whiteframe {
@@ -84,10 +84,9 @@
     }
 
     .notifications-menu.md-menu-content {
-
-    .md-list {
-        background: $ grey-100;
-    }
+        .md-list {
+            background: $grey-100;
+        }
 
     }
     .new-notification {
