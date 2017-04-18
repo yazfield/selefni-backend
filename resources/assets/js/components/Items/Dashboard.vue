@@ -22,7 +22,7 @@
                 this.$store.dispatch('loadItems', nextPage)
                     .then(() => {
                         this.pending = false;
-                    }).catch((error) => {
+                    }).catch(() => {
                     this.pending = false;
                 });
             },
@@ -62,23 +62,12 @@
                     </md-card-header>
 
                     <md-card-actions>
-                        <md-menu md-size="4" md-direction="bottom right" md-align-trigger>
-                            <md-button class="md-icon-button" md-menu-trigger>
-                                <md-icon>speaker_notes</md-icon>
-                            </md-button>
-
-                            <md-menu-content>
-                                <md-menu-item>
-                                    <md-icon>notifications</md-icon>
-                                    <span>Selefni</span>
-                                </md-menu-item>
-
-                                <md-menu-item>
-                                    <md-icon>email</md-icon>
-                                    <span>Email</span>
-                                </md-menu-item>
-                            </md-menu-content>
-                        </md-menu>
+                        <md-button class="md-icon-button">
+                            <md-icon>notifications</md-icon>
+                        </md-button>
+                        <md-button class="md-icon-button">
+                            <md-icon>email</md-icon>
+                        </md-button>
                     </md-card-actions>
                 </md-card>
                 <md-layout class="loading" v-if="pending" md-align="center">

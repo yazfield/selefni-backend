@@ -38,7 +38,7 @@
     </md-menu>
 </template>
 <style lang="scss">
-    @import "../../sass/_variables";
+    @import "../../sass/_variables.scss";
 
     .title {
         font-weight: bold;
