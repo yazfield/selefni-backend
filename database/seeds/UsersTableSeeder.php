@@ -28,5 +28,13 @@ class UsersTableSeeder extends Seeder
             'phone_number' => '213555669999',
             'active'       => true,
         ], \App::make(Hasher::class)))->save();
+
+        $user = (new User([
+            'name'         => 'someone',
+            'email'        => 'hanifiy@gmail.com',
+            'password'     => 'password',
+            'phone_number' => '213555569999',
+            'active'       => true,
+        ], \App::make(Hasher::class)))->save();
     }
 }

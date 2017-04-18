@@ -97,6 +97,8 @@ class Item implements ItemServiceContract
         $item->fill($data)
             ->save();
 
+        $item->load('borrowedTo', 'borrowedFrom');
+
         return $item;
     }
 

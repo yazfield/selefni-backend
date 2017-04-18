@@ -46,7 +46,10 @@ class User extends Authenticatable implements HasMedia
      * @var array
      */
     protected $hidden = ['password', 'remember_token', 'deleted_at', 'activation_code',
-        'activation_code_expires_at', 'active', ];
+        'activation_code_expires_at',
+        'active',
+        'media'
+    ];
 
     /**
      * Cast to Carbon dates.
