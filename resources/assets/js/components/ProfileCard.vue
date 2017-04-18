@@ -47,7 +47,7 @@
     }
 
     .sub-title {
-        color: $ grey-600;
+        color: $grey-600;
     }
 
     .loading {
