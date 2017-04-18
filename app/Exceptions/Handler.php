@@ -6,6 +6,7 @@ use Exception;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Validation\ValidationException;
 
 class Handler extends ExceptionHandler
 {
@@ -47,13 +48,40 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Exception $exception)
     {
+        // FIXME: how about expectsJson() ?? do we need redirects?
+        if (($response = $this->renders($request, $exception))) {
+            return $response;
+        }
+
         if ($exception instanceof ModelNotFoundException) {
             return response()->json([
                 'error' => 'Record not found',
             ], 404);
         }
 
+        if ($exception instanceof ValidationException) {
+            return response()->json([
+                'errors' => $exception->validator->messages()
+            ], 400);
+        }
+
+
         return parent::render($request, $exception);
+    }
+
+    /**
+     * Checks if the exception renders a response and returns is
+     * @param \Illuminate\Http\Request $request
+     * @param Exception                $exception
+     * @return \Illuminate\Http\Response|null
+     */
+    public function renders($request, Exception $exception)
+    {
+        if (method_exists($exception, 'render')) {
+            return $exception->render($request);
+        }
+
+        return null;
     }
 
     /**
