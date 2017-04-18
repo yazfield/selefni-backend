@@ -68,6 +68,11 @@ const actions = {
                     commit(types.LOGOUT_SUCCESS);
                     resolve();
                 }).catch(error => {
+                if (error.response && error.response.status === 401) {
+                    commit(types.LOGOUT_SUCCESS);
+                    resolve();
+                    return;
+                }
                 commit(types.LOGOUT_FAILURE, error);
                 reject(error);
             });
