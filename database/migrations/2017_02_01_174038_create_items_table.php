@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class CreateItemsTable extends Migration
 {
@@ -22,6 +22,8 @@ class CreateItemsTable extends Migration
             $table->timestamp('return_at');
             $table->integer('borrowed_to');
             $table->integer('borrowed_from');
+            $table->timestamp('returned_at')->nullable();
+            $table->timestamp('borrowed_at')->useCurrent();
             $table->softDeletes();
             $table->timestamps();
         });
