@@ -1,12 +1,13 @@
 <script>
     import {mapGetters} from 'vuex';
     import VueFlatpickr from '../../VueFlatPickr/components/index';
-    import myUpload from 'vue-image-crop-upload/upload-2.vue';
     import * as apiConstants from '../../api/constants';
+    import Autocomplete from '../../Autocomplete/vue-autocomplete.vue';
     export default {
         props: ['id'],
         data(){
             return {
+                borrowedOrLent: '',
                 update: false,
                 pending: false,
                 dirtyItem: {},
@@ -31,7 +32,7 @@
             };
         },
         computed: {
-            ...mapGetters(['items', 'areItemsLoaded']),
+            ...mapGetters(['items', 'areItemsLoaded', 'user']),
             item() {
                 if (this.areItemsLoaded) {
                     return this.items.data.find(item => item.id === this.id);
@@ -39,7 +40,8 @@
                 return null;
             },
             theOtherGuy() {
-                if (this.item.borrowed_to.id === this.id) {
+                console.log('other guy', this.item.borrowed_to.id, this.user.id);
+                if (this.item.borrowed_to.id !== this.user.id) {
                     return this.item.borrowed_to;
                 }
                 return this.item.borrowed_from;
@@ -54,7 +56,13 @@
                 return this.item.amount && this.item.amount > 0;
             },
             iBorrowed() {
-                return this.item.borrowed_to.id === this.id;
+                return this.item.borrowed_to.id  !== this.user.id;
+            },
+            borrowerField() {
+                if (this.iBorrowed) {
+                    return 'borrowed_to';
+                }
+                return 'borrowed_from';
             },
             borrowerHeader() {
                 if (this.iBorrowed) {
@@ -91,6 +99,15 @@
             },
             commitUpdate() {
                 this.pending = true;
+                //borrowedOrLent
+                console.log(this.dirtyItem.borrowed_from.id, this.dirtyItem.borrowed_to.id);
+                if(this.borrowedOrLent !== this.borrowerField) {
+                    console.log(this.borrowedOrLent, this.borrowerField);
+                    const swap = Object.assign({}, this.dirtyItem.borrowed_from);
+                    this.dirtyItem.borrowed_from = Object.assign({}, this.dirtyItem.borrowed_to);
+                    this.dirtyItem.borrowed_to = swap;
+                }
+                console.log(this.dirtyItem.borrowed_from.id, this.dirtyItem.borrowed_to.id);
                 // FIXME: don't update if not dirty
                 this.$store.dispatch('updateItem', this.dirtyItem)
                     .then(() => {
@@ -138,7 +155,11 @@
             },
             chooseImage() {
                 this.$refs.itemImage.click();
-            }
+            },
+            selectedFriend(obj){
+                console.log('selected', obj);
+                this.dirtyItem[this.borrowerField] = obj;
+            },
         },
         activated() {
             if (this.item === null) {
@@ -147,13 +168,14 @@
             this.dirtyItem = Object.assign({}, this.item);
             this.update = false;
             this.pending = false;
+            this.borrowedOrLent = this.borrowerField;
             this.$nextTick(() => {
                 this.$refs['itemDialog'].open();
             });
         },
         components: {
             'Flatpickr': VueFlatpickr,
-            'my-upload': myUpload,
+            'Autocomplete': Autocomplete,
         }
     }
 </script>
@@ -178,9 +200,6 @@
                             leave-active-class="animate speed-animation fadeOut">
                     <img v-show="update" :src="dirtyItem.image" :alt="dirtyItem.name"/>
                 </transition>
-                <my-upload v-if="update" field="img" url="apiConstants.UPLOAD_ITEM_IMAGE"
-                           :width="300" :height="300" :params="imageUpload.params"
-                           lang-type="en" :value.sync="imageUpload.show" img-format="png"></my-upload>
             </md-card-media>
 
             <md-card-header class="md-whiteframe md-whiteframe-2dp">
@@ -264,18 +283,25 @@
 
                     <transition :enter-active-class="inAnimation" :leave-active-class="outAnimation">
                         <md-list-item v-if="update">
-                            <md-input-container style="flex:1">
-                                <label for="movie">{{ borrowerHeader }}</label>
-                                <md-select name="movie" id="movie">
-                                    <md-option value="fight_club">Fight Club</md-option>
-                                    <md-option value="godfather">Godfather</md-option>
-                                    <md-option value="godfather_ii">Godfather II</md-option>
-                                    <md-option value="godfather_iii">Godfather III</md-option>
-                                    <md-option value="godfellas">Godfellas</md-option>
-                                    <md-option value="pulp_fiction">Pulp Fiction</md-option>
-                                    <md-option value="scarface">Scarface</md-option>
+                            <md-input-container  style="flex:4">
+                                <label>Direction</label>
+                                <md-select v-model="borrowedOrLent">
+                                    <md-option value="borrowed_from">Borrowed from</md-option>
+                                    <md-option value="borrowed_to">Borrowed to</md-option>
                                 </md-select>
                             </md-input-container>
+                            <span style="flex:1"></span>
+                            <autocomplete
+                                    :initValue="this.dirtyItem[this.borrowerField].name"
+                                    url="/api/users/search"
+                                    anchor="name"
+                                    subtitle="email"
+                                    label="Search"
+                                    :on-select="selectedFriend"
+                                    :wrapInput="true"
+                                    :inputWrapperClass="'md-input-container'"
+                                    :inputClass="'md-input'" style="flex:10">
+                            </autocomplete>
                             <span style="flex:1"> </span>
                         </md-list-item>
                     </transition>
@@ -368,6 +394,7 @@
     @import '../../../sass/_variables.scss';
     @import 'node_modules/sass-material-colors/sass/sass-material-colors';
     @import 'node_modules/vue-material/src/core/stylesheets/variables.scss';
+    /*@import '/node_modules/vue2-autocomplete-js/dist/style/vue2-autocomplete.css';*/
 
     .flatpickr-calendar.open {
         z-index: 20;

@@ -74,6 +74,13 @@ class UsersController extends Controller
         return response()->json($user->toArray());
     }
 
+    public function search(Request $request)
+    {
+        $users = $this->userService->search($request->get('q'));
+
+        return response()->json($users->toArray());
+    }
+
     public function logout(Request $request)
     {
         $request->user()->token()->revoke();

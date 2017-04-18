@@ -104,6 +104,14 @@ class User implements UserServiceContract
         return $user;
     }
 
+    public function search(string $query)
+    {
+
+        return $this->model->where('name', 'like', sprintf('%%%s%%', $query))
+            // FIXME: ->friends() must be implemented
+            ->get();
+    }
+
     public function find($id, bool $includeTrashed = false): UserModel
     {
         return $this->findBy(username_field($id), $id, $includeTrashed);
