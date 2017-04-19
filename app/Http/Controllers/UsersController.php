@@ -74,9 +74,9 @@ class UsersController extends Controller
         return response()->json($user->toArray());
     }
 
-    public function search(Request $request)
+    public function searchFriends(Request $request)
     {
-        $users = $this->userService->search($request->get('q'));
+        $users = $this->userService->searchFriends($request->user(), $request->get('q'));
 
         return response()->json($users->toArray());
     }

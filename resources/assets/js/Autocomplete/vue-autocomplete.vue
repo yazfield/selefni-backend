@@ -282,13 +282,27 @@
 
                     let ajax = new XMLHttpRequest();
 
-                    let params = "";
+                    let params = {
+                        [this.param]: val
+                    };
                     if(this.customParams) {
                         Object.keys(this.customParams).forEach((key) => {
-                            params += `&${key}=${this.customParams[key]}`
+                            params[key] = this.customParams[key];
                         })
                     }
+                    this.$http.get(this.url, {
+                        params
+                    }).then(response => {
+                        let json = response.data;
 
+                        // Callback Event
+                        this.onAjaxLoaded ? this.onAjaxLoaded(json) : null;
+
+                        self.json = self.process ? self.process(json) : json;
+
+                    });
+
+                    /*
                     ajax.open('GET', `${this.url}?${this.param}=${val}${params}`, true);
                     ajax.send();
 
@@ -307,6 +321,7 @@
 
                         self.json = self.process ? self.process(json) : json;
                     });
+                    */
 
                 }
             },

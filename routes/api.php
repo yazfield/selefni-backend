@@ -14,7 +14,7 @@
 
 Route::group(['prefix' => '/users',], function ()
 {
-    Route::get('/search', 'UsersController@search');
+    Route::get('/searchFriends', 'UsersController@searchFriends')->middleware('auth:api');
     Route::get('/{id}', 'UsersController@show')->middleware('auth:api');
     Route::post('/', 'UsersController@store');
     Route::post('/{id}/avatar', 'UsersController@setAvatar')

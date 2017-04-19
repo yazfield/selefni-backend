@@ -167,4 +167,18 @@ class User extends Authenticatable implements HasMedia
     {
         return $this->hasMany('App\Item', 'borrowed_from');
     }
+
+    public function friends()
+    {
+        return $this->belongsToMany(self::class, 'friendships', 'user_id', 'friend_id')
+            ->withTimestamps();
+    }
+
+    public function addFriend($friendId)
+    {
+        $this->friends()->attach($friendId);
+        $friend = self::find($friendId);
+        $friend->friends()->attach($this->id);
+        return $this;
+    }
 }

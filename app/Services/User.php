@@ -104,11 +104,16 @@ class User implements UserServiceContract
         return $user;
     }
 
-    public function search(string $query)
+    public function searchFriends(UserModel$user, string $term)
     {
 
-        return $this->model->where('name', 'like', sprintf('%%%s%%', $query))
-            // FIXME: ->friends() must be implemented
+        return $user->friends()
+            ->where(function ($query) use($term) {
+                $query->orWhere('name', 'like', sprintf('%%%s%%', $term));
+                $query->orWhere('email', 'like', sprintf('%%%s%%', $term));
+                $query->orWhere('phone_number', 'like', sprintf('%%%s%%', $term));
+            })
+            ->limit(3)
             ->get();
     }
 

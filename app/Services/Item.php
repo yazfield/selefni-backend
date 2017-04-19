@@ -62,7 +62,14 @@ class Item implements ItemServiceContract
             $data[$data['new_user']] = $user->id;
         }
 
-        return $this->model->create($data);
+        $item = $this->model->create($data);
+        $item->load('borrowedTo', 'borrowedFrom');
+
+        if(! $item->borrowedFrom->friends()->where('friend_id', $item->borrowedTo->id)->count()) {
+            $item->borrowedFrom->addFriend($item->borrowedTo->id);
+        }
+
+        return $item;
     }
 
     public function setImage($id, UploadedFile $image): ItemModel
@@ -96,8 +103,11 @@ class Item implements ItemServiceContract
 
         $item->fill($data)
             ->save();
-
         $item->load('borrowedTo', 'borrowedFrom');
+
+        if(! $item->borrowedFrom->friends()->where('friend_id', $item->borrowedTo->id)->count()) {
+            $item->borrowedFrom->addFriend($item->borrowedTo->id);
+        }
 
         return $item;
     }

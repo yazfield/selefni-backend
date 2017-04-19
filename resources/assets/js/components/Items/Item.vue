@@ -293,7 +293,7 @@
                             <span style="flex:1"></span>
                             <autocomplete
                                     :initValue="this.dirtyItem[this.borrowerField].name"
-                                    url="/api/users/search"
+                                    url="/api/users/searchFriends"
                                     anchor="name"
                                     subtitle="email"
                                     label="Search"
