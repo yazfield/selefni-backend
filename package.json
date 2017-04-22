@@ -8,6 +8,7 @@
     "production": "cross-env NODE_ENV=production node_modules/webpack/bin/webpack.js --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js"
   },
   "devDependencies": {
+    "@kazupon/vue-i18n-loader": "^0.1.1",
     "babel-plugin-transform-object-rest-spread": "^6.23.0",
     "cross-env": "^4.0.0",
     "jquery": "^3.1.1",
