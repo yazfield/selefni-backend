@@ -1,5 +1,5 @@
 <template>
-    <md-toolbar class="md-large header">
+    <md-toolbar class="md-large header md-whiteframe md-whiteframe-3dp">
         <div class="md-toolbar-container">
             <md-button class="md-icon-button">
                 <md-icon>menu</md-icon>
@@ -49,12 +49,15 @@
         color: white;
         text-decoration: none;
 
-    &
-    :hover {
-        color: white;
-        text-decoration: none;
+        &:hover {
+            color: white;
+            text-decoration: none;
+        }
     }
-
+    .md-toolbar.md-whiteframe {
+        position: fixed;
+        width: 100%;
+        z-index: 2;
     }
 </style>
 
