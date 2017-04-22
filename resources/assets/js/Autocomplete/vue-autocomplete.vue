@@ -19,7 +19,7 @@
             </md-input-container>
             <md-menu-content>
                 <md-menu-item v-if="!json.length">
-                    <p>Items list</p>
+                    <p>No results</p>
                 </md-menu-item>
                 <md-menu-item @selected="selectList(data)" v-for="(data, i) in json">
                     <md-avatar>
@@ -84,6 +84,10 @@
                 type: String,
                 default: ""
             },
+            initialData: {
+                type: Array,
+                default: []
+            },
 
             // Anchor of list
             anchor: {
@@ -144,7 +148,8 @@
                 showList: false,
                 type: "",
                 json: [],
-                focusList: ""
+                focusList: "",
+                fetching: false
             };
         },
 
@@ -270,7 +275,7 @@
 
             getData(val){
 
-
+                this.fetching = true;
                 let self = this;
 
                 if (val.length < this.min) return;
@@ -279,8 +284,6 @@
 
                     // Callback Event
                     this.onBeforeAjax ? this.onBeforeAjax(val) : null;
-
-                    let ajax = new XMLHttpRequest();
 
                     let params = {
                         [this.param]: val
@@ -299,7 +302,10 @@
                         this.onAjaxLoaded ? this.onAjaxLoaded(json) : null;
 
                         self.json = self.process ? self.process(json) : json;
+                        self.fetching = false;
 
+                    }).catch(error => {
+                        self.fetching = false;
                     });
 
                     /*
@@ -337,6 +343,7 @@
         },
         mounted() {
             this.mdInput = this.$el.querySelector('.md-input');
+            this.json = this.json.concat(this.initialData);
         },
         watch: {
             showList: function(value) {

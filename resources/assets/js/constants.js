@@ -4,3 +4,8 @@ export const templates = {
     dashboard: 'dashboard',
     default: 'dashboard'
 };
+export const itemTypes = {
+    object: 'object',
+    book: 'book',
+    money: 'money'
+};
