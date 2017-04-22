@@ -1,12 +1,14 @@
 <script>
     import {mapGetters} from 'vuex';
+    import {includes} from 'lodash';
     import {templates} from '../../constants';
     import NewItem from './NewItem';
     import Item from './Item';
     export default {
         data() {
             return {
-                pending: false
+                pending: false,
+                selection: []
             }
         },
         computed: {
@@ -29,6 +31,16 @@
             selectItem(itemId) {
                 this.$router.push({name: 'item', params: {id: itemId}});
                 this.$store.dispatch('showItem', itemId);
+            },
+            isSelected(itemId) {
+                return includes(this.selection, itemId);
+            },
+            toggleSelected(itemId) {
+                if(this.isSelected(itemId)) {
+                    this.selection.splice(this.selection.indexOf(itemId), 1);
+                } else {
+                    this.selection.push(itemId);
+                }
             }
         },
         components: {
@@ -43,13 +55,29 @@
 
 <template>
     <md-layout>
-        <NewItem></NewItem>
+        <md-button @click.native="" class="md-fab md-fab-bottom-right">
+            <md-icon>add</md-icon>
+        </md-button>
         <div class="cards-wrapper">
-            <md-layout class="cards-container" v-infinite-scroll="loadItems" infinite-scroll-disabled="pending"
-                       infinite-scroll-distance="10">
+            <transition-group name="list" tag="div" class="md-layout cards-container"
+                              v-infinite-scroll="loadItems" infinite-scroll-disabled="pending"
+                              infinite-scroll-distance="10"
+                              enter-active-class="animated slideInDown"
+                              leave-active-class="animated slideOutUp">
                 <md-card
-                        :class="{hide: showingItem === item.id, 'md-primary': item.type=='object', 'md-accent':item.type=='money', 'md-warn':item.type=='book'}"
-                        :id="'item-' + item.id" md-with-hover v-for="item in items.data">
+                        :class="{hide: showingItem === item.id,
+                            'md-primary': item.type=='object',
+                            'md-accent':item.type=='money',
+                            'md-warn':item.type=='book',
+                            'selected': isSelected(item.id)
+                            }"
+                        :id="'item-' + item.id" :md-with-hover="!isSelected(item.id)"
+                        v-for="item in items.data"
+                        :key="item.id">
+                    <md-button @click.native="toggleSelected(item.id)" class="md-icon-button select-button">
+                        <md-icon>done</md-icon>
+                    </md-button>
+
                     <a @click.stop.prevent="selectItem(item.id)">
                         <md-card-media md-ratio="1:1">
                             <md-ink-ripple @click="selectItem(item.id)"></md-ink-ripple>
@@ -70,9 +98,9 @@
                         </md-button>
                     </md-card-actions>
                 </md-card>
-                <md-layout class="loading" v-if="pending" md-align="center">
-                    <md-spinner md-indeterminate></md-spinner>
-                </md-layout>
+            </transition-group>
+            <md-layout class="loading" v-if="pending" md-align="center">
+                <md-spinner md-indeterminate></md-spinner>
             </md-layout>
         </div>
         <keep-alive>
@@ -82,20 +110,73 @@
 </template>
 
 <style lang="scss">
+    @import 'node_modules/sass-material-colors/sass/sass-material-colors';
+    .md-theme-default {
+
+        .md-button.md-icon-button.select-button {
+            position: absolute;
+            top: -10px;
+            left: -15px;
+            z-index: 2;
+            background: white;
+            width: 24px;
+            min-width: 24px;
+            height: 24px;
+            display: none;
+            min-height: 24px;
+
+            &:hover {
+                background: white;
+            }
+
+            i {
+                color: material-color('grey', '600');
+                width: 16px;
+                min-width: 16px;
+                height: 16px;
+                min-height: 16px;
+                font-size: 16px;
+            }
+        }
+    }
     .cards-wrapper {
         height: 100%;
         width: 100%;
+        .md-card {
+            flex-grow: 1;
+            width: 31%;
+            margin: 0.875%;
+            overflow: visible;f
+            &:hover .select-button {
+                display: block;
+
+             }
+
+             &.selected {
+                .select-button {
+                      background: material-color('grey', '800');
+                    display: block;
+                    i {
+                        color: white;
+                    }
+                    &:hover {
+                         background: material-color('grey', '800');
+                        i {
+                            color: white;
+                        }
+                     }
+                }
+                border: 4px solid material-color('grey', '800');
+                border-radius: 5px;
+              }
+        }
     }
 
     .cards-container {
         padding: 0.875%;
     }
 
-    .md-card {
-        flex-grow: 1;
-        width: 31%;
-        margin: 0.875%;
-    }
+
 
     .md-theme-default .md-card .md-card-area .md-card-actions .md-icon-button:not(.md-primary):not(.md-warn):not(.md-accent) .md-icon {
         color: rgba(255, 255, 255, .54);
