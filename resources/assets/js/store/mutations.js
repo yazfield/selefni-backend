@@ -1,5 +1,5 @@
-import * as types from './mutation-types';
-import {templates} from '../constants';
+import * as types from "./mutation-types";
+import {templates} from "../constants";
 
 export const mutations = {
     [types.CHANGE_TEMPLATE] (state, template) {
@@ -8,5 +8,8 @@ export const mutations = {
         } else {
             state.template = templates.default;
         }
+    },
+    [types.SET_LOCALE] (state, locale) {
+        state.locale = locale;
     }
-}
+};

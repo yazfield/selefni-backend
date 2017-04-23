@@ -16,7 +16,8 @@ const persists = [
 const debug = process.env.NODE_ENV !== 'production';
 
 const state = {
-    template: templates.default
+    template: templates.default,
+    locale: 'en'
 };
 export default new Vuex.Store({
     state,

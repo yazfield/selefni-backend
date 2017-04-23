@@ -43,9 +43,9 @@ axios.interceptors.request.use(function (config) {
 sync(store, router);
 
 const i18n = new VueI18n({
-    locale: 'en', // set locale
+    locale: store.state.locale,
     fallbackLocale: 'en',
-    messages: locales, // set locale messages
+    messages: locales // set locale messages
 });
 
 const app = new Vue({
