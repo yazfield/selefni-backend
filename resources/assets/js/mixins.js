@@ -17,3 +17,15 @@ export const itemFieldModel = {
         this.internalValue = this.value;
     }
 };
+
+export const sendNotification = {
+    methods: {
+        sendEmailNotification: function() {
+            // FIXME: should i send an action here?y
+            this.$emit('emailNotification');
+        },
+        sendWebNotification: function() {
+            this.$emit('webNotification');
+        }
+    }
+};

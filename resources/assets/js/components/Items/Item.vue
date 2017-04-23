@@ -2,6 +2,7 @@
     import {mapGetters} from 'vuex';
     import * as apiConstants from '../../api/constants';
     import * as ItemWidgets from './Widgets';
+    import {itemTypes} from '../../constants';
 
     export default {
         props: ['id'],
@@ -34,6 +35,15 @@
                     return this.items.data.find(item => item.id === this.id);
                 }
                 return null;
+            },
+            itemClasses: function() {
+                return {
+                    hide: this.hide,
+                    'md-primary': this.dirtyItem.type === itemTypes.object,
+                    'md-accent': this.dirtyItem.type  === itemTypes.money,
+                    'md-warn': this.dirtyItem.type === itemTypes.book,
+                    'card-ripple': this.update
+                };
             },
             friend() {
                 if (this.dirtyItem.borrowed_to.id !== this.user.id) {
@@ -144,7 +154,7 @@
 <template>
     <md-dialog class="item-dialog" :md-open-from="id | itemId" :md-close-to="id | itemId" v-on:close="closing"
                ref="itemDialog">
-        <md-card class="md-primary" :class="{'card-ripple': update}">
+        <md-card class="md-primary" :class="itemClasses">
             <md-card-media md-ratio="1:1">
                 <item-media @change="imageChange" :image="dirtyItem.image" :update="update"
                             :alt="dirtyItem.name"></item-media>

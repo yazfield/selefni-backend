@@ -1,15 +1,9 @@
 
 <script>
+import {sendNotification} from '../../../mixins';
 export default {
     props: ['update'],
-    methods: {
-        sendEmailNotification: function() {
-            this.$emit('email');
-        },
-        sendWebNotification: function() {
-            this.$emit('web');
-        }
-    },
+    mixins: [sendNotification]
 }
 </script>
 <template>
