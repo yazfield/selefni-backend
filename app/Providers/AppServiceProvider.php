@@ -2,9 +2,11 @@
 
 namespace App\Providers;
 
-use Laravel\Dusk\DuskServiceProvider;
-use Illuminate\Support\ServiceProvider;
+use App\Item;
+use App\Observers\ItemObserver;
 use Illuminate\Contracts\Hashing\Hasher;
+use Illuminate\Support\ServiceProvider;
+use Laravel\Dusk\DuskServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -15,7 +17,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        $this->bootObservers();
+    }
+
+    public function bootObservers()
+    {
+        Item::observe(ItemObserver::class);
     }
 
     /**

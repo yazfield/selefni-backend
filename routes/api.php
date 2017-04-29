@@ -30,6 +30,10 @@ Route::get('/profile', 'UsersController@profile')->middleware('auth:api');
 Route::post('/logout', 'UsersController@logout')->middleware('auth:api');
 
 //Route::resource('/items', 'ItemsController');//->middleware('auth:api');
-Route::put('/items/{id}', 'ItemsController@update');
-Route::post('/items/{id}/media', 'ItemsController@setImage');
+Route::put('/items/{id}', 'ItemsController@update')->middleware('auth:api');
+Route::post('/items/{id}/media', 'ItemsController@setImage')->middleware('auth:api');
 Route::get('/user_items', 'ItemsController@user')->middleware('auth:api');
+
+Route::get('/notifications', 'UsersController@notifications')->middleware('auth:api');
+Route::put('/notifications', 'UsersController@setNotificationsRead')->middleware('auth:api');
+Route::delete('/notifications', 'UsersController@deleteNotifications')->middleware('auth:api');

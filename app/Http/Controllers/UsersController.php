@@ -74,6 +74,40 @@ class UsersController extends Controller
         return response()->json($user->toArray());
     }
 
+    public function notifications(Request $request): JsonResponse
+    {
+        $notifications = $this->userService->getUserNotifications($request->user());
+        return response()->json($notifications);
+    }
+
+    public function setNotificationsRead(Request $request)
+    {
+        if($this->userService->setNotificationsRead($request->user(), $request->notifications)) {
+            return response()->json([
+                'message' => 'Notifications read',
+                'notifications' => $request->notifications
+            ], 200);
+        }
+        // FIXME: throw exception
+        return response()->json([
+            'error' => 'Server error',
+        ], 500);
+    }
+
+    public function deleteNotifications(Request $request)
+    {
+        if($this->userService->deleteNotifications($request->user(), $request->notifications)) {
+            return response()->json([
+                'message' => 'Notifications deleted',
+                'notifications' => $request->notifications
+            ], 200);
+        }
+        // FIXME: throw exception
+        return response()->json([
+            'error' => 'Server error',
+        ], 500);
+    }
+
     public function searchFriends(Request $request)
     {
         $users = $this->userService->searchFriends($request->user(), $request->get('q'));

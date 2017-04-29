@@ -9,3 +9,16 @@ export const itemTypes = {
     book: 'book',
     money: 'money'
 };
+
+export const echoConfig = {
+    broadcaster: 'pusher',
+    key: 'b8916ff1958671f01876',
+    cluster: 'eu',
+    encrypted: true
+};
+
+export const notificationTypes = {
+    item: {
+        amountChanged: 'App\\Notifications\\ItemAmountChanged'
+    }
+};

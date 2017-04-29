@@ -11,3 +11,6 @@ export const LOGOUT = '/api/logout';
 export const USER_ITEMS = '/api/user_items';
 export const UPDATE_ITEM = template('/api/items/{{ id }}');
 export const UPLOAD_ITEM_IMAGE = template('/api/items/{{ id }}/media');
+
+// notifications
+export const USER_NOTIFICATIONS = '/api/notifications';

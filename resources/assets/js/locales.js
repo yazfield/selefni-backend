@@ -26,6 +26,11 @@ export default {
                     book: 'Book'
                 }
             }
+        },
+        notifications: {
+            none: 'You have no notifications',
+            header: 'Notifications',
+            dismiss_all: 'Dismiss all'
         }
     }
 };

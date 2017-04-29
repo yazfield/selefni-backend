@@ -5,6 +5,7 @@ import {mutations} from "./mutations";
 import {getters} from "./getters";
 import auth from "./modules/auth";
 import items from "./modules/items";
+import notifications from "./modules/notifications";
 import {templates} from "../constants";
 
 Vue.use(Vuex);
@@ -26,7 +27,8 @@ export default new Vuex.Store({
     getters,
     modules: {
         auth,
-        items
+        items,
+        notifications
     },
     strict: debug,
     plugins: [...persists]

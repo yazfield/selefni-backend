@@ -25,12 +25,14 @@ Vue.material.registerTheme('default', AppTheme);
 Vue.component('App', App);
 Vue.component('slide-transition', SlideTransition);
 
-axios.defaults.baseUrl = baseDomain;
-Vue.prototype.$http = axios;
-Vue.$http = axios;
+const instance = axios.create();
+instance.defaults.baseUrl = baseDomain;
+Vue.prototype.$http = instance;
+Vue.$http = instance;
 window.Vue = Vue;
+window.axios = axios;
 
-axios.interceptors.request.use(function (config) {
+Vue.$http.interceptors.request.use(function (config) {
     if (store.getters.getToken) {
         config.headers.Authorization = store.getters.getToken.getAuthorizationHeader();
     }

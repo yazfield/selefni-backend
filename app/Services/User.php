@@ -12,8 +12,10 @@ use App\Events\UserEvents\UserSubscribedEvent;
 use App\Exceptions\ActivationCodeExpiredException;
 use App\Exceptions\EmailAlreadyExistsException;
 use App\Exceptions\PhoneNumberAlreadyExistsException;
+use App\Item as ItemModel;
 use App\Services\Contracts\UserService as UserServiceContract;
 use App\User as UserModel;
+use Carbon\Carbon;
 use Illuminate\Http\UploadedFile;
 
 /**
@@ -102,6 +104,48 @@ class User implements UserServiceContract
         $user->setAvatar($avatar);
 
         return $user;
+    }
+
+    // FIXME: this method is preparing a view of data, that should probably go to the controller
+    public function getUserNotifications(UserModel $user)
+    {
+        $notifications = $user->notifications()
+                    //->limit(config('selefni.user.notifications.limit', 5))
+                    ->get()
+                    ->toArray();
+
+        $model = $this->model;
+        return array_map(function ($notification) use ($model) {
+            $user = $model->find($notification['data']['from_id'])->toArray();
+            $notification['data']['from'] = array_only($user, ['id', 'avatar', 'name']);
+
+            // FIXME: using model directly, needs repo
+            $item = ItemModel::find($notification['data']['item_id'])->toArray();
+            $notification['data']['item'] = array_only($item, ['id', 'name']);
+
+            $notification['data']['item']['old_amount'] = $notification['data']['old_amount'];
+            $notification['data']['item']['new_amount'] = $notification['data']['new_amount'];
+            unset($notification['data']['old_amount']);
+            unset($notification['data']['new_amount']);
+
+            return $notification;
+        }, $notifications);
+    }
+
+    public function setNotificationsRead(UserModel $user, array $ids)
+    {
+        return $user->unreadNotifications()
+                             ->whereIn('id', $ids)
+                             ->update([
+                                 'read_at' => new Carbon
+                             ]);
+    }
+
+    public function deleteNotifications(UserModel $user, array $ids)
+    {
+        return $user->notifications()
+                    ->whereIn('id', $ids)
+                    ->delete();
     }
 
     public function searchFriends(UserModel$user, string $term)

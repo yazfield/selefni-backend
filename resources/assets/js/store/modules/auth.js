@@ -8,7 +8,6 @@ const state = {
     user: null,
     token: null,
     error: null,
-    notifications: []
 };
 
 const persist = createPersistedState({
@@ -42,7 +41,6 @@ const getters = {
     user: state => state.user,
     getToken: state => state.token,
     authError: state => state.error,
-    notifications: state => state.notifications
 };
 
 const actions = {
