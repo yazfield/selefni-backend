@@ -1,7 +1,7 @@
 <script>
 import Autocomplete from '../../../Autocomplete/vue-autocomplete';
 export default {
-    props: ['update', 'direction', 'friend'],
+    props: ['update', 'direction', 'friend', 'isOwner'],
     watch: {
         internalDirection: function (value) {
             this.$emit('direction', value);
@@ -47,7 +47,7 @@ export default {
                 </div>
             </md-list-item>
 
-            <md-list-item v-else>
+            <md-list-item v-else-if="isOwner">
                 <md-input-container  style="flex:4">
                     <label>{{ $t('item.friend.direction') }}</label>
                     <md-select v-model="internalDirection">

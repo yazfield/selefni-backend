@@ -15,10 +15,7 @@ class Item extends Model implements HasMedia
     }
 
     protected $fillable = ['name', 'details', 'amount', 'type', 'return_at',
-        'borrowed_to',
-        'borrowed_from',
-        'returned_at',
-        'borrowed_at',
+        'borrowed_to', 'borrowed_from', 'returned_at', 'borrowed_at', 'owner_id',
     ];
     protected $hidden = ['deleted_at'];
 
@@ -38,6 +35,8 @@ class Item extends Model implements HasMedia
         return $this->getImageUrl();
     }
 
+    // FIXME: maybe use a pivot table because if one user deletes the item the other will
+    // have it deleted too
     public function borrowedFrom()
     {
         return $this->belongsTo('App\User', 'borrowed_from');
@@ -64,6 +63,16 @@ class Item extends Model implements HasMedia
     public function scopeNotReturned($query)
     {
         return $query->whereNull('returned_at');
+    }
+
+    public function belongsToUser($id)
+    {
+        return $this->borrowed_from == $id || $this->borrowed_to == $id;
+    }
+
+    public function owner()
+    {
+        return $this->belongsTo(User::class, 'owner_id');
     }
 
 }

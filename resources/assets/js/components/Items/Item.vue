@@ -185,7 +185,8 @@
                 <md-list class="custom-list md-triple-line">
                     <item-type v-model="dirtyItem.type" :update="update"></item-type>
                     <item-friend :update="update" :direction="borrowerField" :friend="friend"
-                                 @friend="selectedFriend" @direction="directionChanged"></item-friend>
+                                 @friend="selectedFriend" @direction="directionChanged"
+                                :is-owner="dirtyItem.owner_id === user.id"></item-friend>
                     <item-notify :update="update"></item-notify>
                     <item-amount v-model="dirtyItem.amount" :type="dirtyItem.type" :update="update"></item-amount>
                     <item-details v-model="dirtyItem.details" :update="update"></item-details>

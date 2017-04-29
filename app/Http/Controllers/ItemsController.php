@@ -58,7 +58,9 @@ class ItemsController extends Controller
             'image'         => 'sometimes|image',
         ]);
 
-        $result = $this->itemService->store($request->all());
+        $data = array_add($request->all(), 'owner_id', auth()->user()->id);
+
+        $result = $this->itemService->store($data);
 
         return response()->json($result->toArray());
     }
