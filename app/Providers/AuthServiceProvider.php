@@ -2,8 +2,10 @@
 
 namespace App\Providers;
 
-use Laravel\Passport\Passport;
+use App\Item;
+use App\Policies\ItemPolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
+use Laravel\Passport\Passport;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -13,7 +15,7 @@ class AuthServiceProvider extends ServiceProvider
      * @var array
      */
     protected $policies = [
-        'App\Model' => 'App\Policies\ModelPolicy',
+        Item::class, ItemPolicy::class
     ];
 
     /**
@@ -26,6 +28,7 @@ class AuthServiceProvider extends ServiceProvider
         $this->registerPolicies();
 
         Passport::routes();
+        // FIXME: delete this because we're not using jwt anymore and refactor
         Passport::enableImplicitGrant();
     }
 }

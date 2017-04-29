@@ -4,8 +4,8 @@ namespace App\Notifications;
 
 use App\User;
 use Illuminate\Bus\Queueable;
-use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notification;
 
 class ActivationEmail extends Notification
 {
@@ -44,10 +44,11 @@ class ActivationEmail extends Notification
     {
         // TODO: setup lang files and email views
         return (new MailMessage)->greeting('Hello,')
-            ->line('The introduction to the notification.')
-            ->action('Notification Action', 'https://laravel.com')
+            ->subject('Selefni Acount Activation')
+            ->line('Welcome to Selefni app, you shall never forget what you have borrowed or lent.')
             ->line('Thank you for using our application!')
-            ->line(sprintf('Activate your account with this code: %d', $notifiable->activation_code));
+            ->action('Activate your account', 'https://www.selefni.com')
+            ->line(sprintf('Or use this activation code: %d', $notifiable->activation_code));
     }
 
     /**
