@@ -65,16 +65,24 @@ export class Item {
             rawItem = JSON.parse(rawItem);
         }
 
-        const keys = ['id', 'name', 'type', 'details', 'created_at', 'updated_at', 'returned_at',
-            'to_return_at', 'amount', 'image', 'borrowed_at', 'borrowed_to', 'borrowed_from'];
-
+        const dates = ['created_at', 'updated_at', 'returned_at', 'return_at', 'borrowed_at'];
+        const keys = ['id', 'name', 'type', 'details', 'amount', 'image', 'borrowed_to', 'borrowed_from', 'owner_id'];
         for (let [k, v] of Object.entries(rawItem)) {
+            if (includes(dates, k)) {
+                this[k] = new Date(v);
+                continue;
+            }
             if (!includes(keys, k)) {
                 throw new Error('Uknown item key ' + k);
             }
             this[k] = v;
         }
     }
+
+    isOwner(id) {
+        return id === this.owner_id;
+    }
+
 }
 
 export function extractItemData(item) {

@@ -17,7 +17,7 @@ class Item extends Model implements HasMedia
     protected $fillable = ['name', 'details', 'amount', 'type', 'return_at',
         'borrowed_to', 'borrowed_from', 'returned_at', 'borrowed_at', 'owner_id',
     ];
-    protected $hidden = ['deleted_at'];
+    protected $hidden = ['deleted_at', 'media'];
 
     protected $dates = [ 'returned_at', 'borrowed_at', 'return_at', ];
 
@@ -73,6 +73,17 @@ class Item extends Model implements HasMedia
     public function owner()
     {
         return $this->belongsTo(User::class, 'owner_id');
+    }
+
+    protected function attemptLogin(Request $request)
+    {
+        $values = ['admin', 'distributor']; //all roles that are allowed
+        foreach ($values as $value) {
+            if ($this->guard()->attempt(array_merge($this->credentials($request), ['role' => $value]), $request->has('remember'))) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

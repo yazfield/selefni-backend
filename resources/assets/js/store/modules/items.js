@@ -3,7 +3,7 @@
  */
 import * as types from "../mutation-types";
 import {items} from "../../api";
-import {extractItemData} from "./utils";
+import {extractItemData, Item} from "../utils";
 
 const state = {
     items: {
@@ -80,6 +80,11 @@ const mutations = {
     },
     [types.LOAD_ITEMS_SUCCESS](state, data) {
         state.pending = false;
+        if (data.data.length) {
+            data.data = data.data.map((rawItem) => {
+                return new Item(rawItem);
+            });
+        }
         if (state.items.total === null) {
             state.items = data;
         } else {
@@ -121,7 +126,7 @@ const mutations = {
     [types.UPDATE_ITEM_SUCCESS](state, data) {
         const idx = state.items.data.findIndex(item => item.id === data.id);
         state.items.data.splice(idx, 1);
-        state.items.data.push(data);
+        state.items.data.push(new Item(data));
     },
     [types.UPDATE_ITEM_FAILURE](state, error) {
         //state.pending = false;

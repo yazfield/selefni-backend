@@ -1,6 +1,6 @@
 import * as types from "../mutation-types";
 import {auth} from "../../api";
-import {Token, User} from "./utils";
+import {Token, User} from "../utils";
 import createPersistedState from "vuex-persistedstate";
 
 const state = {

@@ -3,15 +3,13 @@ import Vuex from "vuex";
 import {actions} from "./actions";
 import {mutations} from "./mutations";
 import {getters} from "./getters";
-import auth from "./modules/auth";
-import items from "./modules/items";
-import notifications from "./modules/notifications";
+import * as modules from "./modules";
 import {templates} from "../constants";
 
 Vue.use(Vuex);
 
 const persists = [
-    auth.persist
+    modules.auth.persist
 ];
 
 const debug = process.env.NODE_ENV !== 'production';
@@ -25,11 +23,7 @@ export default new Vuex.Store({
     actions,
     mutations,
     getters,
-    modules: {
-        auth,
-        items,
-        notifications
-    },
+    modules,
     strict: debug,
     plugins: [...persists]
 });
