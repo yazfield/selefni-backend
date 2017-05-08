@@ -35,6 +35,7 @@ $factory->define(App\Item::class, function (Faker\Generator $faker) {
         'type' => 'object',
         'borrowed_to' => 1,
         'borrowed_from' => 2,
+        'owner_id' => 2,
     ];
 });
 
