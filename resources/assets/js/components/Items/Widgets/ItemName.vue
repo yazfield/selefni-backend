@@ -1,21 +1,15 @@
 <script>
 import {itemFieldModel} from '../../../mixins';
 export default {
+    name: 'ItemName',
     mixins: [itemFieldModel]
 }
 </script>
 <template>
-    <div class="md-title" v-if="update">
-        <md-input-container md-inline>
-            <label>{{ $t('item.name.label') }}</label>
-            <md-input v-model="internalValue"></md-input>
-        </md-input-container>
+    <v-text-field v-if="update" dark name="item-name" v-model="internalValue" single-line
+                  :label="$t('item.name.label')" class="mt-2 mb-0" style="width: 80%"></v-text-field>
+    <div v-else>
+        <v-card-title class="mb-3 pl-0 pt-2">{{ internalValue }}</v-card-title>
+        <v-spacer></v-spacer>
     </div>
-    <div class="md-title" v-else>{{ internalValue }}</div>
 </template>
-
-<style lang="scss">
-    .item-dialog .md-card .md-title {
-        margin-bottom: 8px;
-    }
-</style>

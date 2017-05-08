@@ -2,27 +2,28 @@
 <script>
 import {sendNotification} from '../../../mixins';
 export default {
+    name: 'ItemNotify',
+    mixins: [sendNotification],
     props: ['update'],
-    mixins: [sendNotification]
 }
 </script>
 <template>
     <div>
         <slide-transition>
-            <md-subheader v-if="!update">{{ $t('item.notification.notify') }}</md-subheader>
+            <v-subheader v-if="!update" v-text="$t('item.notification.notify')"/>
         </slide-transition>
 
         <slide-transition>
-            <md-list-item v-if="!update">
-                <md-layout>
-                    <md-button @click.native="sendWebNotification" class="md-icon-button">
-                        <md-icon>notifications</md-icon>
-                    </md-button>
-                    <md-button @click.native="sendEmailNotification" class="md-icon-button">
-                        <md-icon>email</md-icon>
-                    </md-button>
-                </md-layout>
-            </md-list-item>
+            <v-list-item v-if="!update">
+                <v-container style="text-align: left;" class="pl-3">
+                    <v-btn @click.native="sendWebNotification" icon small flat>
+                        <v-icon>notifications</v-icon>
+                    </v-btn>
+                    <v-btn @click.native="sendEmailNotification" icon small flat>
+                        <v-icon>email</v-icon>
+                    </v-btn>
+                </v-container>
+            </v-list-item>
         </slide-transition>
     </div>
 </template>

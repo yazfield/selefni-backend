@@ -2,24 +2,25 @@
 import {itemTypes} from '../../../constants';
 import {itemFieldModel} from '../../../mixins';
 export default {
+    name: 'ItemType',
     mixins: [itemFieldModel],
     computed: {
-        types: function() {
-            return itemTypes;
+        types() {
+            let items = [];
+            for (let [k, v] of Object.entries(itemTypes)) {
+                items.push({value: v, text: this.$t('item.type.types.' + v)});
+            }
+            return items;
         },
     }
 }
 </script>
 <template>
     <slide-transition>
-        <md-list-item v-if="update">
-            <md-input-container style="flex:1">
-                <label >{{ $t('item.type.label') }}</label>
-                <md-select v-model="internalValue">
-                    <md-option v-for="(type, key) in types" :value="key" v-once>{{ $t('item.type.types.' + type) }}</md-option>
-                </md-select>
-            </md-input-container>
-            <span style="flex:1"> </span>
-        </md-list-item>
+        <v-list-item v-if="update">
+            <v-select :items="types" v-model="internalValue" :label="$t('item.type.label')" light
+                    single-line auto style="flex:1"/>
+            <span style="flex:3"> </span>
+        </v-list-item>
     </slide-transition>
 </template>

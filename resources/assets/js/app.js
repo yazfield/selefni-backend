@@ -6,6 +6,8 @@ import axios from "axios";
 import VueMaterial from "vue-material";
 import infiniteScroll from "vue-infinite-scroll";
 import VueI18n from "vue-i18n";
+import Vuetify from "vuetify";
+
 import AppTheme from "../sass/AppTheme";
 import App from "./components/App";
 import {baseDomain} from "./constants";
@@ -19,6 +21,7 @@ Vue.use(VueRouter);
 Vue.use(VueMaterial);
 Vue.use(infiniteScroll);
 Vue.use(VueI18n);
+Vue.use(Vuetify);
 
 Vue.material.registerTheme('default', AppTheme);
 

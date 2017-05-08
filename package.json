@@ -11,9 +11,10 @@
     "babel-plugin-transform-object-rest-spread": "^6.23.0",
     "cross-env": "^4.0.0",
     "jquery": "^3.1.1",
-    "laravel-mix": "^0.8.3",
+    "laravel-mix": "^0.11.4",
     "lodash": "^4.17.4",
-    "sass-material-colors": "^0.0.5"
+    "sass-material-colors": "^0.0.5",
+    "vuetify": "^0.11.1"
   },
   "dependencies": {
     "animate.css": "^3.5.2",
@@ -21,11 +22,10 @@
     "babel-polyfill": "^6.23.0",
     "laravel-echo": "^1.3.0",
     "pusher-js": "^4.1.0",
-    "vue": "^2.1.10",
+    "vue": "^2.3.2",
     "vue-flatpickr": "^2.3.0",
     "vue-i18n": "^6.1.1",
     "vue-infinite-scroll": "^2.0.1",
-    "vue-material": "^0.7.1",
     "vue-router": "^2.3.1",
     "vue2-autocomplete-js": "^0.0.4",
     "vuex": "^2.2.1",

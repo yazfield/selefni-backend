@@ -1,25 +1,24 @@
 <script>
 import {itemFieldModel} from '../../../mixins';
 export default {
+    name: 'itemDetails',
     mixins: [itemFieldModel]
 }
 </script>
 <template>
     <div>
         <slide-transition>
-            <md-subheader v-if="!update">{{ $t('item.details') }}</md-subheader>
+            <v-subheader v-if="!update">{{ $t('item.details') }}</v-subheader>
         </slide-transition>
 
         <slide-transition>
-            <md-list-item v-if="update">
-                <md-input-container>
-                    <label>{{ $t('item.details') }}</label>
-                    <md-textarea v-model="internalValue"></md-textarea>
-                </md-input-container>
-            </md-list-item>
-            <md-list-item v-else>
+            <v-list-item v-if="update">
+                <v-text-field :label="$t('item.details')" multi-line v-model="internalValue">
+                </v-text-field>
+            </v-list-item>
+            <v-list-item v-else>
                 <span>{{ internalValue }}</span>
-            </md-list-item>
+            </v-list-item>
         </slide-transition>
     </div>
 </template>

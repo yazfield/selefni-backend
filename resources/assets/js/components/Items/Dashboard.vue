@@ -14,7 +14,14 @@
         computed: {
             ...mapGetters(['items', 'showingItem'])
         },
+        components: { NewItem, ItemWidget },
         methods: {
+            hideItemWidget: function(itemId) {
+                return this.showingItem === itemId;
+            },
+            isSelected(itemId) {
+                return includes(this.selection, itemId);
+            },
             loadItems() {
                 const nextPage = this.items.current_page + 1;
                 if (this.items.last_page !== null && nextPage > this.items.last_page) {
@@ -32,8 +39,8 @@
                 this.$router.push({name: 'item', params: {id: itemId}});
                 this.$store.dispatch('showItem', itemId);
             },
-            isSelected(itemId) {
-                return includes(this.selection, itemId);
+            sortedItems: function(items) {
+                return orderBy(items, 'updated_at', 'desc');
             },
             toggleSelected(itemId) {
                 if(this.isSelected(itemId)) {
@@ -41,15 +48,8 @@
                 } else {
                     this.selection.push(itemId);
                 }
-            },
-            hideItemWidget: function(itemId) {
-                return this.showingItem === itemId;
-            },
-            sortedItems: function(items) {
-                return orderBy(items, 'updated_at', 'desc');
             }
         },
-        components: { NewItem, ItemWidget },
         mounted() {
             this.$store.dispatch('changeTemplate', templates.dashboard);
         }
@@ -57,12 +57,12 @@
 </script>
 
 <template>
-    <md-layout>
-        <md-button @click.native="" class="md-fab md-fab-bottom-right">
-            <md-icon>add</md-icon>
-        </md-button>
+    <v-container>
+        <v-btn floating primary dark class="add-item-button">
+            <v-icon>add</v-icon>
+        </v-btn>
         <div class="cards-wrapper">
-            <transition-group name="list" tag="div" class="md-layout cards-container"
+            <transition-group name="list" tag="div" class="cards-container"
                               v-infinite-scroll="loadItems" infinite-scroll-disabled="pending"
                               infinite-scroll-distance="10" enter-active-class="animated slideInDown"
                               leave-active-class="animated slideOutUp">
@@ -70,29 +70,64 @@
                              :item="item" @selected="toggleSelected(item.id)" @click="showItem(item.id)"
                              :selected="isSelected(item.id)"></item-widget>
             </transition-group>
-            <md-layout class="loading" v-if="pending" md-align="center">
-                <md-spinner md-indeterminate></md-spinner>
-            </md-layout>
+            <div class="loading" v-if="pending">
+                <v-progress-circular indeterminate class="primary--text" :size="70" />
+            </div>
         </div>
         <keep-alive>
             <router-view></router-view>
         </keep-alive>
-    </md-layout>
+    </v-container>
 </template>
 
 <style lang="scss">
-    @import 'node_modules/sass-material-colors/sass/sass-material-colors';
-
+    /* TODO: check if this is repeated */
+    .loading {
+        text-align: center;
+    }
+    .add-item-button {
+        float: right;
+        margin-top: 50%;
+    }
     .cards-wrapper {
         height: 100%;
         width: 100%;
-        .md-card {
+        .card {
             flex-grow: 1;
+        }
+    }
+    @media screen and (max-width: 600px){
+        .cards-wrapper .card {
+            min-width: 100%;
+            width: 100%;
+            margin: 0 0 2% 0;
+        }
+    }
+    @media screen and (max-width: 960px){
+        .cards-wrapper .card {
+            min-width: 46.5%;
+            width: 46.5%;
+            margin: 0.875%;
+        }
+    }
+    @media screen and (max-width: 1280px){
+        .cards-wrapper .card {
+            min-width: 31%;
+            width: 31%;
+            margin: 0.875%;
+        }
+    }
+    @media screen and (max-width: 1920px){
+        .cards-wrapper .card {
+            min-width: 31%;
             width: 31%;
             margin: 0.875%;
         }
     }
     .cards-container {
         padding: 0.875%;
+        display: flex;
+        flex-wrap: wrap;
+        flex-direction: row;
     }
 </style>

@@ -1,32 +1,24 @@
 <script>
 export default {
-    props: ['update', 'image', 'alt'],
-    data: function() {
+    name: 'ItemMedia',
+    props: ['alt', 'image', 'update'],
+    data() {
         return {
             imageUpload: {
                 file: null,
-                name: '',
-                image: ''
+                image: '',
+                name: ''
             }
         };
     },
     watch: {
-        image: function(value) {
+        image(value) {
             this.imageUpload.image = value;
         }
     },
     methods: {
         chooseImage() {
             this.$refs.itemImage.click();
-        },
-        imageChange(e) {
-            e.preventDefault();
-            let files = e.target.files || e.dataTransfer.files;
-            if (!files.length) {
-                return;
-            }
-            this.createImage(files[0]);
-            this.$emit('change', this.imageUpload);
         },
         createImage(file){
             this.imageUpload.file = file;
@@ -37,6 +29,15 @@ export default {
                 return this.internalImage = e.target.result;
             };
             reader.readAsDataURL(file);
+        },
+        imageChange(e) {
+            e.preventDefault();
+            let files = e.target.files || e.dataTransfer.files;
+            if (!files.length) {
+                return;
+            }
+            this.createImage(files[0]);
+            this.$emit('change', this.imageUpload);
         }
     },
     created() {
@@ -45,14 +46,13 @@ export default {
 };
 </script>
 <template>
-    <div>
+    <div style="position: relative">
         <input v-show="false" ref="itemImage" type="file" name="image" @change="imageChange">
         <transition enter-active-class="animated speed-animation fadeIn"
                     leave-active-class="animated speed-animation fadeOut">
-            <md-button class="image-button" @click.native="chooseImage"
-                       v-if="update">
-                <md-icon>add_a_photo</md-icon>
-            </md-button>
+            <v-btn class="image-button" @click.native="chooseImage" v-if="update" flat>
+                <v-icon>add_a_photo</v-icon>
+            </v-btn>
         </transition>
         <transition enter-active-class="animated speed-animation fadeIn"
                     leave-active-class="animated speed-animation fadeOut" mode="in-out">
@@ -63,30 +63,7 @@ export default {
 </template>
 
 <style lang="scss">
-    @import 'node_modules/vue-material/src/core/stylesheets/variables.scss';
-    .flatpickr-calendar.open {
-        z-index: 20;
-    }
-
-    .flatpickr-input {
-        border: none;
-        border-bottom: 1px solid white;
-        background: transparent;
-        color: white;
-        font-size: 14px;
-        font-family: $font-roboto;
-
-        &:focus {
-            outline: none;
-        }
-
-    }
-    .flatpickr-input.active {
-        border-bottom: 2px solid white;
-        color: rgba(255, 255, 255, .87);
-    }
-
-    .md-button.image-button {
+    .btn.image-button {
         position: absolute;
         color: white;
         background: rgba(0, 0, 0, 0.5);

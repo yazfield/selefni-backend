@@ -2,7 +2,7 @@
 @import "variables";
 @import url("//fonts.googleapis.com/css?family=Roboto:300,400,500,700,400italic");
 @import url("//fonts.googleapis.com/icon?family=Material+Icons");
-@import "node_modules/vue-material/dist/vue-material";
+@import '/node_modules/vuetify/dist/vuetify.min.css';
 @import "/node_modules/animate.css/animate.css";
 
 // ToolBar.vue
@@ -11,19 +11,8 @@
       margin-left: 10px;
         margin-right: 2.5%;
     }
-    .search .md-input-container {
-        button .md-icon:not(.md-icon-delete):after {
-            height: 0;
-        }
-        label {
-            left: 7.5%;
-        }
-    }
 }
 .main-navigation {
-    a.md-button {
-        margin: 0;
-    }
 
   button {
     margin: 0;
@@ -35,11 +24,6 @@
   > div {
     margin: 0 10px;
   }
-  .md-avatar {
-    width: 96px;
-    height: 96px;
-    margin: 0;
-  }
 }
 
 .user-card-links {
@@ -50,9 +34,6 @@
   }
   li:first-child {
     margin-right: 4px;
-  }
-  .md-button {
-    padding: 0 8px;
   }
 }
 

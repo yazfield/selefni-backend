@@ -5,45 +5,27 @@
     import {itemTypes} from '../../constants';
 
     export default {
+        name: 'Item',
         props: ['id'],
         data() {
             return {
-                update: false,
-                pending: false,
                 dirtyItem: {},
-                borrowedAtOptions: {
-                    allowInput: true,
-                    enableTime: false,
-                    maxDate: new Date()
-                },
-                returnAtOptions: {
-                    allowInput: true,
-                    enableTime: false,
-                    // FIXME: find a way to do this
-                    //midDate: this.createdAtOptions.maxDate
-                },
                 imageUpload: {
-                    image: '', name: '', file: null
+                    file: null, image: '', name: ''
                 },
+                pending: false,
+                persist: true,
+                show: false,
+                update: false,
             };
         },
         computed: {
-            ...mapGetters(['items', 'areItemsLoaded', 'user']),
-            item() {
-                // FIXME: maybe show some spinners if items are not loaded
-                if (this.areItemsLoaded) {
-                    return this.items.data.find(item => item.id === this.id);
+            ...mapGetters(['areItemsLoaded', 'items', 'user']),
+            borrowerField() {
+                if (this.iBorrowed) {
+                    return 'borrowed_to';
                 }
-                return null;
-            },
-            itemClasses: function() {
-                return {
-                    hide: this.hide,
-                    'md-primary': this.dirtyItem.type === itemTypes.object,
-                    'md-accent': this.dirtyItem.type  === itemTypes.money,
-                    'md-warn': this.dirtyItem.type === itemTypes.book,
-                    'card-ripple': this.update
-                };
+                return 'borrowed_from';
             },
             friend() {
                 if (this.dirtyItem.borrowed_to.id !== this.user.id) {
@@ -54,18 +36,40 @@
             iBorrowed() {
                 return this.dirtyItem.borrowed_to.id  !== this.user.id;
             },
-            borrowerField() {
-                if (this.iBorrowed) {
-                    return 'borrowed_to';
+            item() {
+                // FIXME: maybe show some spinners if items are not loaded
+                if (this.areItemsLoaded) {
+                    return this.items.data.find(item => item.id === this.id);
                 }
-                return 'borrowed_from';
+                return null;
             },
-
+            itemClasses() {
+                return {
+                    hide: this.hide,
+                    'blue darken-1 white--text': this.item.type === itemTypes.object,
+                    'green darken-1 white--text': this.item.type  === itemTypes.money,
+                    'orange darken-1 white--text': this.item.type === itemTypes.book,
+                    'card-ripple': this.update
+                };
+            }
+        },
+        components: {
+            ...ItemWidgets
+        },
+        watch: {
+            show(value) {
+                if(value === false) {
+                    this.closing();
+                }
+            }
         },
         filters: {
             itemId: value => '#item-' + value
         },
         methods: {
+            closeModal() {
+                this.show = false;
+            },
             closing() {
                 setTimeout(() => {
                     this.$store.dispatch('hideItem');
@@ -75,12 +79,6 @@
                 setTimeout(() => { // FIXME: what if there is no precedent page?
                     this.$router.go(-1);
                 }, 500);
-            },
-            closeModal() {
-                this.$refs['itemDialog'].close();
-            },
-            startUpdate() {
-                this.update = true;
             },
             commitUpdate() {
                 this.pending = true;
@@ -101,19 +99,6 @@
                         // TODO: show toast
                     });
             },
-            updateOrCommit() {
-                if (!this.update) {
-                    this.startUpdate();
-                } else if (!this.pending) {
-                    this.commitUpdate();
-                }
-            },
-            imageChange(imageUpload) {
-                this.imageUpload = imageUpload;
-            },
-            selectedFriend(friend){
-                this.dirtyItem[this.borrowerField] = friend;
-            },
             directionChanged(direction){
                 if(this.borrowerField === direction) {
                     return;
@@ -122,7 +107,12 @@
                 this.dirtyItem.borrowed_from = Object.assign({}, this.dirtyItem.borrowed_to);
                 this.dirtyItem.borrowed_to = swap;
             },
+            imageChange(imageUpload) {
+                this.imageUpload = imageUpload;
+            },
             init() {
+                this.persist = true;
+                this.show = true;
                 this.dirtyItem = Object.assign({}, this.item);
                 this.imageUpload = {
                     image: '',
@@ -131,6 +121,24 @@
                 };
                 this.update = false;
                 this.pending = false;
+                // FIXME: this is a hack to avoid autoclosing the dialog
+                // the problem resides in click-outside directive
+                setTimeout(() => {
+                    this.persist = false;
+                }, 500);
+            },
+            selectedFriend(friend){
+                this.dirtyItem[this.borrowerField] = friend;
+            },
+            startUpdate() {
+                this.update = true;
+            },
+            updateOrCommit() {
+                if (!this.update) {
+                    this.startUpdate();
+                } else if (!this.pending) {
+                    this.commitUpdate();
+                }
             }
         },
         created() {
@@ -142,152 +150,75 @@
                 this.$router.replace({name: 'dashboard'});
             }
             this.init();
-            this.$nextTick(() => {
+            /*this.$nextTick(() => {
                 this.$refs['itemDialog'].open();
-            });
-        },
-        components: {
-            ...ItemWidgets
+            });*/
         }
     }
 </script>
 <template>
-    <md-dialog class="item-dialog" :md-open-from="id | itemId" :md-close-to="id | itemId" v-on:close="closing"
-               ref="itemDialog">
-        <md-card class="md-primary" :class="itemClasses">
-            <md-card-media md-ratio="1:1">
+    <v-dialog width="500" v-model="show" :persistent="persist" class="item-dialog">
+        <v-card :class="itemClasses" class="dialog-card">
+            <v-card-row class="card-media">
                 <item-media @change="imageChange" :image="dirtyItem.image" :update="update"
                             :alt="dirtyItem.name"></item-media>
-            </md-card-media>
-            <md-card-header class="md-whiteframe md-whiteframe-2dp">
-                <md-layout>
-                    <div style="flex:1">
-                        <md-button @click.native="closeModal" class="md-icon-button">
-                            <md-icon>arrow_back</md-icon>
-                        </md-button>
-                    </div>
-                    <div style="flex:10">
-                        <item-name :update="update" v-model="dirtyItem.name"></item-name>
-                        <md-layout>
-                            <item-date :options="borrowedAtOptions" v-model="dirtyItem.borrowed_at"
-                                       :update="update" style="flex:2"></item-date>
-                            <span style="flex:1"></span>
-                            <item-date :options="returnAtOptions" v-model="dirtyItem.return_at"
-                                       :update="update" style="flex:2"></item-date>
-                            <span style="flex:1"></span>
-                            <item-update-button @click="updateOrCommit" :update="update"
-                                                :pending="pending"></item-update-button>
-                        </md-layout>
-                    </div>
-                </md-layout>
-            </md-card-header>
-            <md-card-content>
-                <md-list class="custom-list md-triple-line">
+            </v-card-row>
+            <v-card-row class="card-header">
+                <v-container class="elevation-1 pl-3">
+                    <v-row>
+                        <v-col xs1 class="pa-0 pt-1">
+                            <v-btn icon small @click.native="closeModal">
+                                <v-icon>arrow_back</v-icon>
+                            </v-btn>
+                        </v-col>
+                        <v-col xs11><item-name :update="update" v-model="dirtyItem.name"></item-name></v-col>
+                    </v-row>
+                    <v-row class="pl-4">
+                        <item-date v-model="dirtyItem.borrowed_at"
+                                   :update="update" style="flex: 1;"></item-date>
+                        <span style="flex: 1;"></span>
+                        <item-date v-model="dirtyItem.return_at"
+                                   :update="update"  style="flex: 1;"></item-date>
+                        <span style="flex: 1;"></span>
+                    </v-row>
+                </v-container>
+                <item-update-button @click="updateOrCommit" :update="update"
+                                    :pending="pending"></item-update-button>
+            </v-card-row>
+            <v-card-row class="card-content">
+                <v-list three-line subheader>
                     <item-type v-model="dirtyItem.type" :update="update"></item-type>
                     <item-friend :update="update" :direction="borrowerField" :friend="friend"
                                  @friend="selectedFriend" @direction="directionChanged"
-                                :is-owner="dirtyItem.owner_id === user.id"></item-friend>
+                                 :is-owner="dirtyItem.owner_id === user.id"></item-friend>
                     <item-notify :update="update"></item-notify>
                     <item-amount v-model="dirtyItem.amount" :type="dirtyItem.type" :update="update"></item-amount>
                     <item-details v-model="dirtyItem.details" :update="update"></item-details>
-                </md-list>
-            </md-card-content>
-        </md-card>
-    </md-dialog>
+                </v-list>
+            </v-card-row>
+        </v-card>
+    </v-dialog>
 </template>
-<style lang="scss" rel="stylesheet/scss">
-    @import '../../VueFlatPickr/theme/material_blue.css';
-    @import '../../../sass/_variables.scss';
-    @import 'node_modules/sass-material-colors/sass/sass-material-colors';
-    @import 'node_modules/vue-material/src/core/stylesheets/variables.scss';
+<style lang="scss" scoped>
 
     .item-dialog {
-        .md-theme-default.md-card.md-primary .md-card-content .md-input-container {
-            &:after {
-                height: 1px;
-                position: absolute;
-                right: 0;
-                bottom: 0;
-                left: 0;
-                background-color: material-color('grey', '400');
-                transition: $swift-ease-out;
-                content: " ";
-            }
-            textarea, input, label {
-                color: material-color('grey', '600');
-            }
-            .md-icon:not(.md-icon-delete) {
-                color: material-color('grey', '600');
-            }
-        }
-        .md-theme-default.md-card.md-primary .md-card-content .md-input-container.md-input-focused {
-            textarea, input {
-                color: material-color('grey', '600');
-                -webkit-text-fill-color: material-color('grey', '600');
-            }
-            &:after {
-                height: 2px;
-                position: absolute;
-                right: 0;
-                bottom: 0;
-                left: 0;
-                background-color: material-color('grey', '400');
-                transition: $swift-ease-out;
-                content: " ";
-            }
-        }
-        .md-dialog {
+        .dialog {
             max-height: 90%;
         }
-        .md-list.md-triple-line .md-list-item .md-list-item-container {
-            min-height: auto;
-            padding-top: 0;
-        }
-        .md-card {
+        .card.dialog-card {
             width: 500px;
             max-height: 700px;
             margin: 0;
-            .md-card-media {
+            .card-media {
                 overflow: hidden;
                 height: 200px;
                 min-height: 200px;
+                max-height: 200px;
                 text-align: center;
-                &:has(.md-ink-ripple) {
-                    cursor: pointer;
-                    cursor: hand;
-                }
-                .md-ink-ripple {
-                    cursor: pointer;
-                    cursor: hand;
-                }
             }
-            .md-card-media + .md-card-header {
-                padding-top: 16px;
-            }
-            .md-card-header + .md-card-content {
+            .card-header + .card-content {
                 background: white;
                 color: black;
-            }
-            .md-card-header {
-                padding-left: 8px;
-                .md-input-container {
-                    margin: 0;
-                    padding: 0;
-                    min-height: auto;
-                    label {
-                        top: 3px;
-                    }
-                }
-                .md-input-container.md-input-inline.md-input-focused label {
-                    top: 3px;
-                }
-            }
-        }
-        .md-card-content {
-            /* TODO: scroll the card image up */
-            overflow: auto;
-            .md-input-container {
-                margin-bottom: 15px;
             }
         }
     }

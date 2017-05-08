@@ -1,22 +1,44 @@
 <script>
 import {itemFieldModel} from '../../../mixins';
-import VueFlatpickr from '../../../VueFlatPickr/components/index';
 export default {
-    props: ['options'],
+    name: 'ItemDate',
     mixins: [itemFieldModel],
-    filters: {
-        date: value => {
-            // FIXME: put date format in config
-            let [date, time] = new Date(value).toLocaleString('en-GB').split(', ');
-            return date;
+    props: ['options'],
+    data() {
+        return {
+            menu: ''
         }
     },
-    components: {
-        'flatpickr': VueFlatpickr
-    }
+    methods: {
+        formatDate(value) {
+            console.log('format date');
+            let date = new Date(value);//.toLocaleString('en-GB').split(', ');
+            let params = {
+                weekday: this.$t(`date.weekdays[${date.getDay()}]`),
+                month: this.$t(`date.months[${date.getMonth()}]`),
+                day: date.getDay() + 1
+            };
+            return this.$t('date.format', params);
+        }
+    },
+    created() {
+        if(!this.internalValue) {
+            this.internalValue = new Date();
+        }
+        console.log(this.internalValue);
+    },
 }
 </script>
 <template>
-    <flatpickr :options="options" v-model="internalValue" v-if="update"></flatpickr>
-    <span v-else>{{ internalValue | date}}</span>
+    <v-menu v-if="update" lazy :close-on-content-click="false" v-model="menu" style="z-index: 3">
+        <v-text-field slot="activator" single-line label="Picker in menu" v-model="internalValue"
+                prepend-icon="event" readonly small></v-text-field>
+        <v-date-picker v-model="internalValue" no-title :date-format="formatDate">
+        </v-date-picker>
+    </v-menu>
+    <span v-else>{{ formatDate(internalValue) }}</span>
 </template>
+
+<style lang="scss" scoped>
+
+</style>

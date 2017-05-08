@@ -2,9 +2,13 @@
 import {itemFieldModel} from '../../../mixins';
 import {itemTypes} from '../../../constants';
 export default {
-    props: ['type'],
+    name: 'ItemAmount',
     mixins: [itemFieldModel],
+    props: ['type'],
     computed: {
+        hasAmount() {
+            return this.internalValue && this.internalValue > 0;
+        },
         // FIXME: maybe put these methods inside the store
         isMoney() {
             return this.type === this.types.money;
@@ -12,13 +16,10 @@ export default {
         isObject() {
             return this.type === this.types.object;
         },
-        hasAmount() {
-            return this.internalValue && this.internalValue > 0;
-        },
-        showHeader: function () {
+        showHeader() {
             return !this.update && (this.isMoney || (this.hasAmount && this.isObject));
         },
-        types: function() {
+        types() {
             return itemTypes;
         },
     },
@@ -27,42 +28,46 @@ export default {
 <template>
     <div>
         <slide-transition>
-            <md-subheader v-if="showHeader">{{ $t('item.amount.header') }}</md-subheader>
+            <v-subheader v-if="showHeader">{{ $t('item.amount.header') }}</v-subheader>
         </slide-transition>
 
         <slide-transition>
-            <md-list-item v-if="!update && isMoney">
-                <md-icon>attach_money</md-icon>
-                <span>{{ internalValue }}</span>
-            </md-list-item>
+            <v-list-item v-if="!update && isMoney">
+                <v-list-tile tag="div">
+                    <v-list-tile-action>
+                        <v-icon class="indigo--text">attach_money</v-icon>
+                    </v-list-tile-action>
+                    <v-list-tile-content>
+                        <v-list-tile-title>{{ internalValue }}</v-list-tile-title>
+                    </v-list-tile-content>
+                </v-list-tile>
+            </v-list-item>
         </slide-transition>
         <slide-transition>
-            <md-list-item v-if="!update && hasAmount && isObject">
-                <md-icon>layers</md-icon>
-                <span>{{ internalValue }}</span>
-            </md-list-item>
+            <v-list-item v-if="!update && hasAmount && isObject">
+                <v-list-tile tag="div">
+                    <v-list-tile-action>
+                        <v-icon class="indigo--text">layers</v-icon>
+                    </v-list-tile-action>
+                    <v-list-tile-content>
+                        <v-list-tile-title>{{ internalValue }}</v-list-tile-title>
+                    </v-list-tile-content>
+                </v-list-tile>
+            </v-list-item>
         </slide-transition>
 
         <slide-transition>
-            <md-list-item v-if="update && isMoney">
-                <md-input-container style="flex:1">
-                    <md-icon>attach_money</md-icon>
-                    <label>{{ $t('item.amount.label') }}</label>
-                    <md-input v-model="internalValue"></md-input>
-                </md-input-container>
-                <span style="flex:1"></span>
-            </md-list-item>
+            <v-list-item v-if="update && isMoney">
+                <v-text-field v-model="internalValue" :label="$t('item.amount.label')" single-line
+                        prepend-icon="attach_money"></v-text-field>
+            </v-list-item>
         </slide-transition>
 
         <slide-transition>
-            <md-list-item v-if="update && isObject">
-                <md-input-container style="flex:1">
-                    <md-icon>layers</md-icon>
-                    <label>{{ $t('item.amount.label') }}</label>
-                    <md-input type="number" min="0" v-model="internalValue"></md-input>
-                </md-input-container>
-                <span style="flex:1"></span>
-            </md-list-item>
+            <v-list-item v-if="update && isObject">
+                <v-text-field v-model="internalValue" :label="$t('item.amount.label')" single-line
+                              prepend-icon="layers"></v-text-field>
+            </v-list-item>
         </slide-transition>
     </div>
 </template>

@@ -1,51 +1,44 @@
 <script>
 export default {
+    name: 'ItemUpdateButton',
     props: ['pending', 'update'],
     computed: {
-        colorClass: function() {
-            return { orange: this.update };
+        colorClass() {
+            return {
+                warning: this.update,
+                'blue-grey': !this.update
+            };
         }
     },
     methods: {
-        click: function(e) {
+        click(e) {
             this.$emit('click', e);
         }
     }
 }
 </script>
 <template>
-    <md-button @click.native="click" class="md-fab md-fab-bottom-right"
-               :class="colorClass">
-        <md-spinner class="md-warn md-icon" v-if="pending" md-indeterminate :md-size="24"
-                    :md-stroke="4.4"></md-spinner>
-        <transition enter-active-class="animated speed-animation rotateIn"
-                    leave-active-class="animated speed-animation rotateOut">
-            <md-icon v-if="!pending && update">done</md-icon>
+    <v-btn :loading="pending" :disabled="pending" :class="colorClass"
+           floating="floating" @click.native="click" class="floating-button">
+        <transition enter-active-class="animated rotateIn"
+                    leave-active-class="animated speed-animation rotateOut" mode="out-in">
+            <v-icon v-if="!pending && update">done</v-icon>
         </transition>
-        <transition enter-active-class="animated speed-animation rotateIn"
-                    leave-active-class="animated speed-animation rotateOut">
-            <md-icon v-if="!pending && !update">edit</md-icon>
+        <transition enter-active-class="animated rotateIn"
+                    leave-active-class="animated speed-animation rotateOut" mode="out-in">
+            <v-icon class="float" v-if="!pending && !update">edit</v-icon>
         </transition>
-    </md-button>
+    </v-btn>
 </template>
 
-<style lang="scss">
-    @import 'node_modules/sass-material-colors/sass/sass-material-colors';
-    .md-theme-default.md-button:not([disabled]).md-fab.orange {
-        background-color: material-color('orange', 'a200');
-        &:hover {
-            background-color: material-color('orange', '600');
-        }
+<style lang="scss" scoped>
+    .float {
+        position: absolute;
     }
-    .item-dialog{
-        .md-card {
-            .md-fab.md-fab-bottom-right {
-                bottom: -25px;
-                .spinner {
-                    position: absolute;
-                }
-            }
-        }
+    .btn.floating-button {
+        position: absolute;
+        right: 15px;
+        margin-top: 8%;
+        z-index: 1;
     }
-
 </style>
