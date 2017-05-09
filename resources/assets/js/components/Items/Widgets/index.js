@@ -10,3 +10,4 @@ export {default as ItemType} from './ItemType';
 export {default as ItemDate} from './ItemDate';
 export {default as ItemUpdateButton} from './ItemUpdateButton';
 export {default as ItemMedia} from './ItemMedia';
+export {default as ItemDateDelay} from './ItemDateDelay';

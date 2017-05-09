@@ -159,7 +159,7 @@
 <template>
     <v-dialog width="500" v-model="show" :persistent="persist" class="item-dialog">
         <v-card :class="itemClasses" class="dialog-card">
-            <v-card-row class="card-media">
+            <v-card-row class="card-media" style="height: 200px;">
                 <item-media @change="imageChange" :image="dirtyItem.image" :update="update"
                             :alt="dirtyItem.name"></item-media>
             </v-card-row>
@@ -174,12 +174,13 @@
                         <v-col xs11><item-name :update="update" v-model="dirtyItem.name"></item-name></v-col>
                     </v-row>
                     <v-row class="pl-4">
-                        <item-date v-model="dirtyItem.borrowed_at"
-                                   :update="update" style="flex: 1;"></item-date>
-                        <span style="flex: 1;"></span>
-                        <item-date v-model="dirtyItem.return_at"
-                                   :update="update"  style="flex: 1;"></item-date>
-                        <span style="flex: 1;"></span>
+                        <item-date v-model="dirtyItem.borrowed_at" :update="update" style="flex: 1"
+                                   class="header-date mr-3" :label="$t('item.borrowed_date')"></item-date>
+                        <item-date v-model="dirtyItem.return_at" :update="update" style="flex: 1"
+                                   class="header-date" :label="$t('item.return_date')"></item-date>
+                        <item-date-delay v-if="!update" :date="dirtyItem.return_at"
+                                         :late-date="dirtyItem.returned_at"></item-date-delay>
+                        <span style="flex: 1"></span>
                     </v-row>
                 </v-container>
                 <item-update-button @click="updateOrCommit" :update="update"
@@ -199,11 +200,32 @@
         </v-card>
     </v-dialog>
 </template>
-<style lang="scss" scoped>
+<style lang="scss">
+
+    .header-date {
+        z-index: 3; width: 35%;
+        .input-group--text-field.input-group--prepend-icon .input-group__details {
+            margin-left: 34px;
+        }
+        .input-group--text-field.input-group--prepend-icon label {
+            margin-left: 34px;
+        }
+    }
+
+    .btn.floating-button {
+        position: absolute;
+        right: 15px;
+        margin-top: 8%;
+        z-index: 1;
+        &.update {
+             margin-top: 15%;
+        }
+    }
 
     .item-dialog {
         .dialog {
             max-height: 90%;
+            overflow: hidden;
         }
         .card.dialog-card {
             width: 500px;
@@ -219,6 +241,9 @@
             .card-header + .card-content {
                 background: white;
                 color: black;
+            }
+            .card-content {
+                overflow-y: auto;
             }
         }
     }
