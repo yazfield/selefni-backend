@@ -1,6 +1,7 @@
 export default {
     en: {
         item: {
+            late: 'Returned Late',
             select: 'Select item',
             upload: 'Upload',
             notification: {
@@ -29,6 +30,8 @@ export default {
                     book: 'Book'
                 }
             },
+            borrowed_date: 'Borrowed date',
+            return_date: 'Return date',
         },
         notifications: {
             none: 'You have no notifications',
@@ -50,7 +53,12 @@ export default {
             weekdays: ['Sun.', 'Mon.', 'Tue.', 'Wed.', 'Thu.', 'Fri.', 'Sat.'],
             months: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August',
                 'September', 'October', 'November', 'December'],
-            format: '{weekday} {month} {day}'
+            format: '{weekday} {month} {day}',
+            duration: {
+                days: 'Days',
+                months: 'Months',
+                years: 'Years'
+            }
         }
     }
 };

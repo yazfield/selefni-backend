@@ -46,7 +46,7 @@ export default {
 };
 </script>
 <template>
-    <div style="position: relative">
+    <div style="position: relative; width: 100%; height: 100%;">
         <input v-show="false" ref="itemImage" type="file" name="image" @change="imageChange">
         <transition enter-active-class="animated speed-animation fadeIn"
                     leave-active-class="animated speed-animation fadeOut">

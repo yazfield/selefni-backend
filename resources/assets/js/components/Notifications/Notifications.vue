@@ -2,6 +2,7 @@
     import {mapGetters} from 'vuex';
     import {notificationTypes} from '../../constants';
     export default{
+        name: 'Notifications',
         data() {
             return {
                 loading: true
@@ -9,9 +10,6 @@
         },
         computed: {
             ...mapGetters(['hasNotifications', 'notifications']),
-            notificationItemClasses() {
-                return {'new-notification': !notification.read_at};
-            }
         },
         methods: {
             dismissNotifications(notification) {
@@ -25,6 +23,9 @@
                 }
                 console.log('dispatch', ids);
                 this.$store.dispatch('dismissNotifications', ids);
+            },
+            notificationItemClasses(notification) {
+                return {'new-notification': !notification.read_at};
             },
             notificationText(notification) {
                 if(notification.type === notificationTypes.item.amountChanged) {
@@ -78,7 +79,7 @@
                       enter-active-class="animated slideInLeft"
                       leave-active-class="animated speed-animation slideOutLeft">
                     <v-list-item  v-for="notification in notifications" :key="notification.id"
-                                  :class="notificationItemClasses"
+                                  :class="notificationItemClasses(notification)"
                                   class="notification-item elevation-1">
                         <v-list-tile avatar>
                             <v-list-tile-avatar>

@@ -3,10 +3,11 @@ export default {
     name: 'ItemUpdateButton',
     props: ['pending', 'update'],
     computed: {
-        colorClass() {
+        classes() {
             return {
                 warning: this.update,
-                'blue-grey': !this.update
+                'blue-grey': !this.update,
+                'update': this.update,
             };
         }
     },
@@ -18,7 +19,7 @@ export default {
 }
 </script>
 <template>
-    <v-btn :loading="pending" :disabled="pending" :class="colorClass"
+    <v-btn :loading="pending" :disabled="pending" :class="classes"
            floating="floating" @click.native="click" class="floating-button">
         <transition enter-active-class="animated rotateIn"
                     leave-active-class="animated speed-animation rotateOut" mode="out-in">
@@ -34,11 +35,5 @@ export default {
 <style lang="scss" scoped>
     .float {
         position: absolute;
-    }
-    .btn.floating-button {
-        position: absolute;
-        right: 15px;
-        margin-top: 8%;
-        z-index: 1;
     }
 </style>

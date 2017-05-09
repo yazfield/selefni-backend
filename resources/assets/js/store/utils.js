@@ -65,7 +65,13 @@ export class Item {
             rawItem = JSON.parse(rawItem);
         }
 
-        const dates = ['created_at', 'updated_at', 'returned_at', 'return_at', 'borrowed_at'];
+        if(rawItem.returned_at) {
+            this.returned_at = new Date(rawItem.returned_at);
+        } else {
+            this.returned_at = null;
+        }
+
+        const dates = ['created_at', 'updated_at', 'return_at', 'borrowed_at'];
         const keys = ['id', 'name', 'type', 'details', 'amount', 'image', 'borrowed_to', 'borrowed_from', 'owner_id'];
         for (let [k, v] of Object.entries(rawItem)) {
             if (includes(dates, k)) {
@@ -73,7 +79,8 @@ export class Item {
                 continue;
             }
             if (!includes(keys, k)) {
-                throw new Error('Uknown item key ' + k);
+                continue;
+                //throw new Error('Uknown item key ' + k);
             }
             this[k] = v;
         }

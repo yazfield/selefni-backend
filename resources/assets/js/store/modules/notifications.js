@@ -1,9 +1,6 @@
 /**
  * Created by yzid on 4/27/17.
  */
-/**
- * Created by yzid on 4/10/17.
- */
 import * as types from "../mutation-types";
 import {notifications} from "../../api";
 import Echo from "laravel-echo";

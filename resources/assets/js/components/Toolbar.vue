@@ -13,7 +13,7 @@
             <v-btn icon dark v-if="isLoggedIn">
                 <v-icon>replay</v-icon>
             </v-btn>
-            <app-notifications v-if="isLoggedIn" :notifications="notifications"></app-notifications>
+            <app-notifications v-if="isLoggedIn"></app-notifications>
             <profile-card @show-profile="$emit('show-profile')" v-if="isLoggedIn" :logout="logout"
                           :user="user"></profile-card>
         </v-toolbar-items>
@@ -28,7 +28,7 @@
 
     export default {
         computed: {
-            ...mapGetters(['isLoggedIn', 'notifications', 'user'])
+            ...mapGetters(['isLoggedIn', 'user'])
         },
         components: {
             ProfileCard,
