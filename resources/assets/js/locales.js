@@ -1,5 +1,11 @@
 export default {
     en: {
+        moment: {
+            relativeTime : {
+                future : '+ %s',
+                past : '- %s'
+            }
+        },
         item: {
             late: 'Returned Late',
             select: 'Select item',

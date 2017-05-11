@@ -1,5 +1,5 @@
 <template>
-    <v-toolbar fixed>
+    <v-toolbar fixed class="grey darken-3">
         <v-toolbar-side-icon></v-toolbar-side-icon>
         <v-toolbar-title class="hidden-sm-and-down">
             <router-link class="white--text headline" :to="{ name: 'home' }"

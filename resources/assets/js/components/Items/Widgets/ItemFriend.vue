@@ -30,24 +30,22 @@ export default {
             this.$emit('direction', value);
         },
         internalFriend(value) {
-            console.log('internalFriend', value);
             this.$emit('friend', value);
         }
     },
     methods: {
         getFriends(searchQuery) {
-            console.log('searching');
+            if(!searchQuery) {
+                return;
+            }
             const self = this;
             this.$http.get('/api/users/searchFriends', {
                 params: {q: searchQuery}
             }).then(function(response) {
-                console.log('before fetched', self.friends);
                 self.friends.splice(0, self.friends.length);
                 self.friends = self.friends.concat(response.data);
-                console.log('fetched', self.friends);
             }).catch((error) => {
                 self.friends = [];
-                console.log('error', error);
             });
         },
         search(value) {
@@ -55,7 +53,6 @@ export default {
             debouncedFunction(value)
         },
         selectedFriend(obj) {
-            console.log('selectedFriend', obj);
             this.internalFriend = obj;
         }
     },
@@ -86,32 +83,40 @@ export default {
             </v-list-item>
 
             <v-list-item v-else-if="isOwner">
-                <v-select :items="directionItems" v-model="internalDirection" style="flex:3"
-                          :label="$t('item.friend.direction')" light single-line auto />
-                <span style="flex:1"></span>
-                <v-autocomplete @search="search" :label="$t('item.search')" :items="friends" v-model="internalFriend"
-                            autocomplete item-text="name" item-value="name" chips light max-height="auto"
-                                single-line style="flex:4" :filter="i=>i">
-                    <template slot="selection" scope="data">
-                        <v-chip close @input="data.parent.selectItem(data.item)" @click.native.stop
-                                class="chip--select-multi" :key="data.item">
-                            <v-avatar>
-                                <img :src="data.item.avatar">
-                            </v-avatar>
-                            {{ data.item.name }}
-                        </v-chip>
-                    </template>
-                    <template slot="item" scope="data">
-                        <v-list-tile-avatar>
-                            <img :src="data.item.avatar"/>
-                        </v-list-tile-avatar>
-                        <v-list-tile-content>
-                            <v-list-tile-title v-html="data.item.name"/>
-                            <v-list-tile-sub-title v-html="data.item.email"/>
-                        </v-list-tile-content>
-                    </template>
-                </v-autocomplete>
-                <span style="flex:1"> </span>
+                <v-container>
+                    <v-row>
+                        <v-col xs4 class="mr-4">
+                            <v-select :items="directionItems" v-model="internalDirection" style="flex:3"
+                                      :label="$t('item.friend.direction')" light auto class="mt-3 pt-1"/>
+                            <span style="flex:1"></span>
+                        </v-col>
+                        <v-col xs7>
+                            <v-autocomplete @search="search" :label="$t('item.search')" :items="friends" v-model="internalFriend"
+                                        autocomplete item-text="name" item-value="name" chips light max-height="auto"
+                                             style="flex:4" :filter="i=>i">
+                                <template slot="selection" scope="data">
+                                    <v-chip @input="data.parent.selectItem(data.item)" @click.native.stop
+                                            class="chip--select-multi" :key="data.item">
+                                        <v-avatar style="width: 32px; min-width: 32px;">
+                                            <img :src="data.item.avatar">
+                                        </v-avatar>
+                                        {{ data.item.name }}
+                                    </v-chip>
+                                </template>
+                                <template slot="item" scope="data">
+                                    <v-list-tile-avatar>
+                                        <img :src="data.item.avatar"/>
+                                    </v-list-tile-avatar>
+                                    <v-list-tile-content>
+                                        <v-list-tile-title v-html="data.item.name"/>
+                                        <v-list-tile-sub-title v-html="data.item.email"/>
+                                    </v-list-tile-content>
+                                </template>
+                            </v-autocomplete>
+                            <span style="flex:1"> </span>
+                        </v-col>
+                    </v-row>
+                </v-container>
             </v-list-item>
         </slide-transition>
     </div>

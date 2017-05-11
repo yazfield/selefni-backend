@@ -58,15 +58,27 @@ export default {
 
         <slide-transition>
             <v-list-item v-if="update && isMoney">
-                <v-text-field v-model="internalValue" :label="$t('item.amount.label')" single-line
-                        prepend-icon="attach_money"></v-text-field>
+                <v-container>
+                    <v-row>
+                        <v-col xs6>
+                            <v-text-field v-model="internalValue" :label="$t('item.amount.label')"
+                                prepend-icon="attach_money"></v-text-field>
+                        </v-col>
+                    </v-row>
+                </v-container>
             </v-list-item>
         </slide-transition>
 
         <slide-transition>
             <v-list-item v-if="update && isObject">
-                <v-text-field v-model="internalValue" :label="$t('item.amount.label')" single-line
-                              prepend-icon="layers"></v-text-field>
+                <v-container>
+                    <v-row>
+                        <v-col xs6>
+                            <v-text-field v-model="internalValue" :label="$t('item.amount.label')"
+                                  prepend-icon="layers" class="pl-3"></v-text-field>
+                        </v-col>
+                    </v-row>
+                </v-container>
             </v-list-item>
         </slide-transition>
     </div>

@@ -1,4 +1,5 @@
 import {includes} from "lodash";
+import moment from "moment";
 
 export class Token {
     constructor(rawToken) {
@@ -100,10 +101,16 @@ export function extractItemData(item) {
     let data = {};
     data['borrowed_to'] = item.borrowed_to.id;
     data['borrowed_from'] = item.borrowed_from.id;
-    const keys = ['name', 'type', 'details', 'returned_at', 'return_at',
-        'amount', 'borrowed_at',];
+    const keys = ['name', 'type', 'details', 'amount'];
+    const dates = ['borrowed_at', 'returned_at', 'return_at'];
 
     for (let [k, v] of Object.entries(item)) {
+        if(includes(dates, k)) {
+            const date = moment.utc(v);
+            data[k] = date.isValid() ? date.format('YYYY-M-D HH:mm:ss') : null;
+            console.log(k, data[k]);
+            continue;
+        }
         if (includes(keys, k)) {
             data[k] = v;
         }

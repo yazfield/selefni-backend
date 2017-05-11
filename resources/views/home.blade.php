@@ -1,6 +1,6 @@
 @extends('layouts.app')
 @section('content')
-    <md-layout style="flex:1" id="app" md-align="center" md-gutter>
+    <div style="flex:1;" id="app">
         <App></App>
-    </md-layout>
+    </div>
 @endsection

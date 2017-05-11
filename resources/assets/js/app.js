@@ -3,12 +3,11 @@ import Vuex from "vuex";
 import VueRouter from "vue-router";
 import {sync} from "vuex-router-sync";
 import axios from "axios";
-import VueMaterial from "vue-material";
 import infiniteScroll from "vue-infinite-scroll";
 import VueI18n from "vue-i18n";
 import Vuetify from "vuetify";
+import moment from "moment";
 
-import AppTheme from "../sass/AppTheme";
 import App from "./components/App";
 import {baseDomain} from "./constants";
 import store from "./store";
@@ -18,12 +17,9 @@ import locales from "./locales";
 
 Vue.use(Vuex);
 Vue.use(VueRouter);
-Vue.use(VueMaterial);
 Vue.use(infiniteScroll);
 Vue.use(VueI18n);
 Vue.use(Vuetify);
-
-Vue.material.registerTheme('default', AppTheme);
 
 Vue.component('App', App);
 Vue.component('slide-transition', SlideTransition);
@@ -44,13 +40,17 @@ Vue.$http.interceptors.request.use(function (config) {
     return Promise.reject(error);
 });
 
+moment.updateLocale('en', {
+    ...locales.en.moment
+});
+
 // FIXME: not sure if useful
 sync(store, router);
 
 const i18n = new VueI18n({
     locale: store.state.locale,
     fallbackLocale: 'en',
-    messages: locales // set locale messages
+    messages: locales
 });
 
 const app = new Vue({

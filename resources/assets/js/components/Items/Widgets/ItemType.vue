@@ -18,9 +18,14 @@ export default {
 <template>
     <slide-transition>
         <v-list-item v-if="update">
-            <v-select :items="types" v-model="internalValue" :label="$t('item.type.label')" light
-                    single-line auto style="flex:1"/>
-            <span style="flex:3"> </span>
+            <v-container>
+                <v-row>
+                    <v-col xs6>
+                        <v-select :items="types" v-model="internalValue" :label="$t('item.type.label')"
+                                  light auto/>
+                    </v-col>
+                </v-row>
+            </v-container>
         </v-list-item>
     </slide-transition>
 </template>

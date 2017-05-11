@@ -14,6 +14,13 @@
             }
         },
         computed: {
+            classes() {
+                return {
+                    'light-green': this.differenceDays > 0,
+                    'red': this.differenceDays < 0,
+                    'amber': this.differenceDays === 0
+                }
+            },
             internalDate() {
                 return moment(this.date);
             },
@@ -23,17 +30,14 @@
             difference() {
                 return this.internalDate.from(this.internalLateDate);
             },
-            vuableDifference() {
-                return this.internalDate.diff(this.internalLateDate, 'years')
-                    || this.internalDate.diff(this.internalLateDate, 'months')
-                    || this.internalDate.diff(this.internalLateDate, 'days');
+            differenceDays() {
+                return this.internalDate.diff(this.internalLateDate, 'days');
             }
         },
     }
 </script>
 <template>
-    <v-chip class="red white--text" small v-if="vuableDifference"
-            v-tooltip:bottom="{ html: $t('item.late') }">
+    <v-chip class="white--text" :class="classes" small v-tooltip:bottom="{ html: $t('item.late') }">
         {{ difference }}
     </v-chip>
 </template>

@@ -1,20 +1,19 @@
 <script>
 import {itemTypes} from '../../../constants';
 import {sendNotification} from '../../../mixins';
+import {includes} from 'lodash';
 export default {
     name: 'ItemWidget',
     mixins: [sendNotification],
     props: ['item', 'hide', 'selected'],
     computed: {
         id() {
-            return 'item-' + this.item.id;
+            return this.item.id ? 'item-' + this.item.id : '';
         },
         itemClasses() {
             return {
                 hide: this.hide,
-                'blue darken-1 white--text': this.item.type === itemTypes.object,
-                'green darken-1 white--text': this.item.type  === itemTypes.money,
-                'orange darken-1 white--text': this.item.type === itemTypes.book,
+                'cyan lighten-2 white--text': includes(itemTypes, this.item.type),
                 'selected': this.selected
             };
         }

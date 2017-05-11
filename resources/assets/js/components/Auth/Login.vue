@@ -9,7 +9,11 @@
                         username: '',
                         password: ''
                     },
-                    error: null
+                    error: null,
+                    rules: {
+                        email: [],
+                        password: []
+                    }
                 },
             }
         },
@@ -49,11 +53,11 @@
         </v-row>
         <v-row>
             <form @submit.stop.prevent="login" style="flex: 1">
-                <v-text-field name="username" label="Email" rules="rules.email"
+                <v-text-field name="username" label="Email" :rules="form.rules.email"
                               v-model="form.credentials.username"></v-text-field>
                 <v-text-field name="password" label="Enter your password" hint="At least 8 characters"
                         min="8" append-icon="visibility_off" type="password"
-                        v-model="form.credentials.password" rules="rules.password"></v-text-field>
+                        v-model="form.credentials.password" :rules="form.rules.password"></v-text-field>
                 <v-row>
                     <v-btn :disabled="isLoggingIn" style="flex:1" type="submit" light primary>Login
                     </v-btn>

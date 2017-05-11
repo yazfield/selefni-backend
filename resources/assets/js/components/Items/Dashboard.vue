@@ -2,7 +2,6 @@
     import {mapGetters} from 'vuex';
     import {includes, orderBy} from 'lodash';
     import {templates} from '../../constants';
-    import NewItem from './NewItem';
     import ItemWidget from './Widgets/ItemWidget';
     export default {
         data() {
@@ -14,7 +13,7 @@
         computed: {
             ...mapGetters(['items', 'showingItem'])
         },
-        components: { NewItem, ItemWidget },
+        components: { ItemWidget },
         methods: {
             hideItemWidget: function(itemId) {
                 return this.showingItem === itemId;
