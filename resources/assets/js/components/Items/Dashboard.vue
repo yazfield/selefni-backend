@@ -66,7 +66,7 @@
                               infinite-scroll-distance="10" enter-active-class="animated slideInDown"
                               leave-active-class="animated slideOutUp">
                 <item-widget v-for="item in sortedItems(items.data)" :key="item.id" :hide="hideItemWidget(item.id)"
-                             :item="item" @selected="toggleSelected(item.id)" @click="showItem(item.id)"
+                             :item="item" @selected="toggleSelected(item.id)" @click.stop="showItem(item.id)"
                              :selected="isSelected(item.id)"></item-widget>
             </transition-group>
             <div class="loading" v-if="pending">

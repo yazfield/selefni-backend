@@ -34,7 +34,6 @@
                 },
                 pending: false,
                 modal: {
-                    persist: true, // this is a hack for using model with keep-alive component
                     show: false
                 },
                 state: itemStates.show, // show/edit
@@ -161,15 +160,7 @@
                 };
                 this.state = itemStates.show;
                 this.pending = false;
-                // FIXME: this is a hack to avoid autoclosing the dialog
-                // the problem resides in click-outside directive
-                // first we set the modal to be persisting so clicking outside won't close it
-                // so it doesn't think that clicking on the
-                this.modal.persist = true;
                 this.modal.show = true;
-                setTimeout(() => {
-                    this.modal.persist = false;
-                }, 500);
             },
             selectedFriend(friend){
                 this.dirtyItem[this.friendField] = friend;
@@ -211,7 +202,7 @@
     }
 </script>
 <template>
-    <v-dialog width="500" v-model="modal.show" :persistent="modal.persist" class="item-dialog">
+    <v-dialog width="500" v-model="modal.show" class="item-dialog">
         <v-card :class="itemClasses" class="dialog-card" style="/*overflow: auto;*/">
             <v-card-row class="card-media" style="height: 200px;">
                 <item-media @change="imageChange" :image="dirtyItem.image" :update="isInEditState"

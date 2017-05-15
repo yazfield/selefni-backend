@@ -19,8 +19,8 @@ export default {
         }
     },
     methods: {
-        clicked() {
-            this.$emit('click');
+        clicked(e) {
+            this.$emit('click', e);
         },
         toggleSelected(e) {
             this.$emit('selected', e);
@@ -35,7 +35,7 @@ export default {
             <v-icon>done</v-icon>
         </v-btn>
         <v-card-row height="150px" style="overflow: hidden;">
-            <v-btn tag="a" href="" ripple flat @click.native.prevent="clicked"
+            <v-btn tag="a" href="" ripple flat @click.native.prevent="clicked($event)"
                    style="display: block; height: 100%; padding: 0; margin: 0">
                 <img :src="item.image" :alt="item.name" style="max-width: 100%">
             </v-btn>
