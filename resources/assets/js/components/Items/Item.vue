@@ -5,6 +5,9 @@
     import {itemTypes} from '../../constants';
     import {includes} from 'lodash';
 
+    // FIXME: should this be here?
+    const itemStates = {show: 'show', edit: 'edit'};
+
     export default {
         name: 'Item',
         props: ['id'],
@@ -13,12 +16,12 @@
                 dirtyItem: {
                     id: '',
                     name: '',
-                    owner_id: '',
+                    owner_id: null, // user id
                     amount: null,
                     type: '',
                     image: '',
                     details: '',
-                    borrowed_from: null,
+                    borrowed_from: this.user,
                     borrowed_to: null,
                     borrowed_at: '',
                     return_at: '',
@@ -30,21 +33,24 @@
                     file: null, image: '', name: ''
                 },
                 pending: false,
-                persistModal: true,
-                showModal: false,
-                update: false,
+                modal: {
+                    persist: true, // this is a hack for using model with keep-alive component
+                    show: false
+                },
+                state: itemStates.show, // show/edit
             };
         },
         computed: {
             ...mapGetters(['areItemsLoaded', 'items', 'user']),
-            borrowerField() {
-                if (this.iBorrowed) {
+            // which fields has the friend user object and not currently authenticated user
+            friendField() {
+                if (this.isBorrowing) {
                     return 'borrowed_to';
                 }
                 return 'borrowed_from';
             },
             friend() {
-                if(!this.dirtyItem.borrowed_to) {
+                if(! (this.dirtyItem.borrowed_to && this.dirtyItem.borrowed_from)) {
                     return null;
                 }
                 if (this.dirtyItem.borrowed_to.id !== this.user.id) {
@@ -52,39 +58,48 @@
                 }
                 return this.dirtyItem.borrowed_from;
             },
-            iBorrowed() {
+            isBorrowing() {
                 return this.dirtyItem.borrowed_to && this.dirtyItem.borrowed_to.id !== this.user.id;
             },
-           /* isNew() {
-                return !!this.id;
-            },*/
-            updating() {
-                return !this.isNew && this.update;
+            isBorrower() {
+                return !this.isBorrowing;
+            },
+            isOwner() {
+                if (this.areItemsLoaded) {
+                    return this.item.owner_id === this.user.id
+                }
+                return null;
             },
             item() {
                 // FIXME: maybe show some spinners if items are not loaded
-                if (/*!this.isNew && */this.areItemsLoaded) {
+                if (this.areItemsLoaded) {
                     return this.items.data.find(item => item.id === this.id);
                 }
                 return null;
             },
             itemClasses() {
-                // FIXME: these shold be props
+                // FIXME: these shuold be props maybe
                 return {
                     hide: this.hide,
                     'cyan lighten-2 white--text': includes(itemTypes, this.item.type),
-                    'card-ripple': this.update
+                    'card-ripple': this.isInEditState
                 };
             },
+            isInEditState() {
+                return this.state === itemStates.edit;
+            },
             updateClasses() {
-                return {'pt-4': this.update};
-            }
+                return {'pt-4': this.isInEditState};
+            },
+            isInShowState() {
+                return this.state === itemStates.show;
+            },
         },
         components: {
             ...ItemWidgets
         },
         watch: {
-            showModal(value) {
+            'modal.show': function(value) {
                 if(value === false) {
                     this.closing();
                 }
@@ -95,7 +110,7 @@
         },
         methods: {
             closeModal() {
-                this.showModal = false;
+                this.modal.show = false;
             },
             closing() {
                 setTimeout(() => {
@@ -118,7 +133,7 @@
                         }
                     })
                     .then(() => {
-                        this.update = false;
+                        this.state = itemStates.show;
                         this.pending = false;
                     })
                     .catch(() => {
@@ -127,7 +142,7 @@
                     });
             },
             directionChanged(direction){
-                if(this.borrowerField === direction) {
+                if(this.friendField === direction) {
                     return;
                 }
                 const swap = Object.assign({}, this.dirtyItem.borrowed_from);
@@ -138,32 +153,46 @@
                 this.imageUpload = imageUpload;
             },
             init() {
-                this.persistModal = true;
-                this.showModal = true;
                 this.dirtyItem = Object.assign({}, this.item);
                 this.imageUpload = {
                     image: '',
                     name: '',
                     file: null
                 };
-                this.update = false;
+                this.state = itemStates.show;
                 this.pending = false;
                 // FIXME: this is a hack to avoid autoclosing the dialog
                 // the problem resides in click-outside directive
+                // first we set the modal to be persisting so clicking outside won't close it
+                // so it doesn't think that clicking on the
+                this.modal.persist = true;
+                this.modal.show = true;
                 setTimeout(() => {
-                    this.persistModal = false;
+                    this.modal.persist = false;
                 }, 500);
             },
             selectedFriend(friend){
-                console.log('selected', friend);
-                this.dirtyItem[this.borrowerField] = friend;
+                this.dirtyItem[this.friendField] = friend;
             },
-            startUpdate() {
-                this.update = true;
+            setShowState(){
+                this.state = itemStates.show;
+            },
+            setEditState(){
+                this.state = itemStates.edit;
+            },
+            startEdit() {
+                this.setEditState();
+            },
+            toggleState() {
+                if (this.isInShowState) {
+                    this.setEditState();
+                } else {
+                    this.setShowState();
+                }
             },
             updateOrCommit() {
-                if (!this.update) {
-                    this.startUpdate();
+                if (!this.isInEditState) {
+                    this.startEdit();
                 } else if (!this.pending) {
                     this.commitUpdate();
                 }
@@ -178,17 +207,14 @@
                 this.$router.replace({name: 'dashboard'});
             }
             this.init();
-            /*this.$nextTick(() => {
-                this.$refs['itemDialog'].open();
-            });*/
         }
     }
 </script>
 <template>
-    <v-dialog width="500" v-model="showModal" :persistent="persistModal" class="item-dialog">
+    <v-dialog width="500" v-model="modal.show" :persistent="modal.persist" class="item-dialog">
         <v-card :class="itemClasses" class="dialog-card" style="/*overflow: auto;*/">
             <v-card-row class="card-media" style="height: 200px;">
-                <item-media @change="imageChange" :image="dirtyItem.image" :update="update"
+                <item-media @change="imageChange" :image="dirtyItem.image" :update="isInEditState"
                             :alt="dirtyItem.name"></item-media>
             </v-card-row>
             <v-card-row class="card-header">
@@ -199,30 +225,30 @@
                                 <v-icon>arrow_back</v-icon>
                             </v-btn>
                         </v-col>
-                        <v-col xs11><item-name :update="update" v-model="dirtyItem.name"></item-name></v-col>
+                        <v-col xs11><item-name :update="isInEditState" v-model="dirtyItem.name"></item-name></v-col>
                     </v-row>
                     <v-row class="pl-4">
-                        <item-date v-model="dirtyItem.borrowed_at" :update="update" style="flex: 1"
+                        <item-date v-model="dirtyItem.borrowed_at" :update="isInEditState" style="flex: 1"
                                    class="header-date mr-3" :label="$t('item.borrowed_date')"></item-date>
-                        <item-date v-model="dirtyItem.return_at" :update="update" style="flex: 1"
+                        <item-date v-model="dirtyItem.return_at" :update="isInEditState" style="flex: 1"
                                    class="header-date" :label="$t('item.return_date')"></item-date>
-                        <item-date-delay v-if="!update" :date="dirtyItem.return_at"
+                        <item-date-delay v-if="!isInEditState" :date="dirtyItem.return_at"
                                          :late-date="dirtyItem.returned_at"></item-date-delay>
                         <span style="flex: 1"></span>
                     </v-row>
                 </v-container>
-                <item-update-button @click="updateOrCommit" :update="update"
+                <item-update-button @click="updateOrCommit" :update="isInEditState"
                                     :pending="pending"></item-update-button>
             </v-card-row>
             <v-card-row class="card-content">
                 <v-list three-line subheader>
-                    <item-type v-model="dirtyItem.type" :update="update" :class="updateClasses"></item-type>
-                    <item-friend :update="update" :direction="borrowerField" :friend="friend"
+                    <item-type v-model="dirtyItem.type" :update="isInEditState" :class="updateClasses"></item-type>
+                    <item-friend :update="isInEditState" :direction="friendField" :friend="friend"
                                  @friend="selectedFriend" @direction="directionChanged"
                                  :is-owner="dirtyItem.owner_id === user.id" :class="updateClasses"></item-friend>
-                    <item-notify :update="update"></item-notify>
-                    <item-amount v-model="dirtyItem.amount" :type="dirtyItem.type" :update="update" :class="updateClasses"></item-amount>
-                    <item-details v-model="dirtyItem.details" :update="update"
+                    <item-notify :update="isInEditState"></item-notify>
+                    <item-amount v-model="dirtyItem.amount" :type="dirtyItem.type" :update="isInEditState" :class="updateClasses"></item-amount>
+                    <item-details v-model="dirtyItem.details" :update="isInEditState"
                                   class="grey--text text--darken-2" :class="updateClasses"></item-details>
                 </v-list>
             </v-card-row>
