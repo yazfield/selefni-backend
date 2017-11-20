@@ -53,7 +53,7 @@ const actions = {
         return new Promise((resolve, reject) => {
             items.updateItem(itemId, preparedItem).then((data) => {
                 commit(types.UPDATE_ITEM_SUCCESS, data);
-                resolve();
+                resolve(data);
             }).catch((error) => {
                 commit(types.UPDATE_ITEM_FAILURE, error);
                 reject(error);

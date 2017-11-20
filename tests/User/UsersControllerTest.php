@@ -56,10 +56,12 @@ class UsersControllerTest extends \Tests\TestCase
 
     public function testDestroy()
     {
+        $this->withoutMiddleware();
         $user = factory(\App\User::class)->make();
         $data = array_add($user->toArray(), 'password', 'mysecret');
         $this->json('POST', 'api/users', $data);
-        $this->json('DELETE', "api/users/{$data['email']}")->assertJsonStructure(['message'])->assertStatus(200);
+        dd($this->json('DELETE', "api/users/{$data['email']}")->decodeResponseJson());
+             //->assertJsonStructure(['message'])->assertStatus(200);
     }
 
     public function testActivate()

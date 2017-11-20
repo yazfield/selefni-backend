@@ -12,6 +12,7 @@
         name: 'Item',
         props: ['id'],
         data() {
+            const now = new Date();
             return {
                 dirtyItem: {
                     id: '',
@@ -23,11 +24,11 @@
                     details: '',
                     borrowed_from: this.user,
                     borrowed_to: null,
-                    borrowed_at: '',
-                    return_at: '',
-                    returned_at: '',
-                    created_at: '',
-                    updated_at: '',
+                    borrowed_at: now,
+                    return_at: new Date().toDateString(),
+                    returned_at: now,
+                    created_at: now,
+                    updated_at: now,
                 },
                 imageUpload: {
                     file: null, image: '', name: ''
@@ -65,22 +66,19 @@
             },
             isOwner() {
                 if (this.areItemsLoaded) {
-                    return this.item.owner_id === this.user.id
+                    return this.dirtyItem.owner_id === this.user.id
                 }
                 return null;
             },
             item() {
                 // FIXME: maybe show some spinners if items are not loaded
-                if (this.areItemsLoaded) {
-                    return this.items.data.find(item => item.id === this.id);
-                }
-                return null;
+                return this.areItemsLoaded ? this.items.data.find(item => item.id === this.id) : null;
             },
             itemClasses() {
                 // FIXME: these shuold be props maybe
                 return {
                     hide: this.hide,
-                    'cyan lighten-2 white--text': includes(itemTypes, this.item.type),
+                    'cyan lighten-2 white--text': includes(itemTypes, this.dirtyItem.type),
                     'card-ripple': this.isInEditState
                 };
             },
@@ -190,7 +188,7 @@
             }
         },
         created() {
-            this.dirtyItem = Object.assign({}, this.item);
+            //this.dirtyItem = Object.assign({}, this.item);
         },
         activated() {
             // FIXME: this is producing a bug when you access an item from route directly

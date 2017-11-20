@@ -4,10 +4,7 @@
         name: 'ItemDateDelay',
         props: {
             date: {
-                required: true,
-                validator(value) {
-                    return value instanceof Date || Date.parse(value)
-                }
+                required: true
             },
             lateDate: {
                 required: true
@@ -22,7 +19,7 @@
                 }
             },
             internalDate() {
-                return moment(this.date);
+                return moment(this.date || new Date);
             },
             internalLateDate() {
                 return moment(this.lateDate || new Date);

@@ -60,7 +60,6 @@ export default {
         this.internalDirection = this.direction;
         this.internalFriend = Object.assign({}, this.friend);
         this.friends.push(this.friend);
-        this.autocompleteInput = this.friend.name;
     }
 }
 </script>
